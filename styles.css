@@ -1,0 +1,2287 @@
+@font-face {
+  font-family: 'Kangmas';
+  src: url('assets/fonts/KangmasDemoRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- macOS-style scrollbars: hidden until hovered, no track ---------- */
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.scroll-thin:hover {
+  scrollbar-color: rgba(55, 55, 55, 0.35) transparent;
+}
+
+.scroll-thin::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.scroll-thin:hover::-webkit-scrollbar-thumb {
+  background: rgba(55, 55, 55, 0.35);
+  background-clip: content-box;
+}
+
+.scroll-thin--light:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+.scroll-thin--light:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  background-clip: content-box;
+}
+
+:root {
+  --navy: #1f396b;
+  --navy-deep: #122446;
+  --navy-shadow: #0c172b;
+  --card-shadow: #122446;
+  --cream: #eadec8;
+  --tan-bg: #efe6db;
+  --tan-card: #e3cfae;
+  --tan-text: #373737;
+  --orange: #d94d27;
+  --orange-shadow: #8e3219;
+  --blue-card: #2a4eb1;
+  --grey-panel: #bab3b1;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--navy);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--cream);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.board {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  height: 100vh;
+  padding: 32px 43px;
+  align-items: stretch;
+}
+
+/* ---------- Sidebar ---------- */
+
+.sidebar {
+  width: 197px;
+  flex-shrink: 0;
+  height: 100%;
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.logo h1 {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 72px;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.logo p {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.26px;
+  margin-top: 4px;
+  color: #ffffff;
+}
+
+.folder-list {
+  --folder-scale: 0.78;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: calc(28px * var(--folder-scale));
+  margin-top: 41px;
+  padding-bottom: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Give the (unscaled) hover shadows/lift room instead of clipping them -
+     top padding matters most, since the hover lift moves items upward. */
+  padding-top: 6px;
+  margin-top: 35px;
+  padding-left: 4px;
+  margin-left: -4px;
+}
+
+.folder-item {
+  position: relative;
+  width: calc(197px * var(--folder-scale));
+  height: calc(176px * var(--folder-scale));
+}
+
+.folder-menu-trigger {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 3;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.folder-menu-trigger:hover { background: rgba(0, 0, 0, 0.55); }
+
+.folder-item:hover .folder-menu-trigger,
+.folder-menu-trigger.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.folder-menu-dropdown {
+  position: absolute;
+  top: 30px;
+  right: 6px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  padding: 6px;
+  border-radius: 14px;
+  background: #efe9df;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.folder-menu-dropdown button {
+  padding: 8px 10px;
+  border-radius: 9px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  color: #201c1d;
+  transition: background-color 0.15s ease;
+}
+
+.folder-menu-dropdown button:hover { background: rgba(0, 0, 0, 0.06); }
+.folder-menu-dropdown button[data-action="delete"] { color: var(--orange-shadow); }
+
+.folder-new {
+  position: relative;
+  width: 197px;
+  height: 176px;
+  transform: translateY(0) scale(var(--folder-scale));
+  transform-origin: top left;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  opacity: 0.7;
+}
+
+.folder-new:hover { transform: translateY(-3px) scale(var(--folder-scale)); opacity: 1; }
+.folder-new:active { transform: translateY(-1px) scale(var(--folder-scale)); }
+
+.folder-new__shape {
+  position: absolute;
+  inset: 0;
+  background: var(--cream);
+  -webkit-mask-image: url('assets/img/folder-new-shape.svg');
+  mask-image: url('assets/img/folder-new-shape.svg');
+  /* "contain" (not 100% 100%) - the SVG's own aspect ratio doesn't match
+     this box, and stretching it unevenly threw the dashed outline off
+     center from the label sitting on top of it. */
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.folder-new__label {
+  position: relative;
+  z-index: 1;
+  top: 5px;
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 21px;
+  line-height: 1.15;
+  color: var(--cream);
+  text-align: center;
+}
+
+.folder {
+  position: relative;
+  width: 197px;
+  height: 176px;
+  transform: translateY(0) scale(var(--folder-scale));
+  transform-origin: top left;
+  filter: drop-shadow(0 4px 0 var(--card-shadow));
+  text-align: left;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.folder:hover {
+  transform: translateY(-3px) scale(var(--folder-scale));
+  filter: drop-shadow(0 6px 0 var(--card-shadow));
+}
+
+.folder:active {
+  transform: translateY(-1px) scale(var(--folder-scale));
+  filter: drop-shadow(0 3px 0 var(--card-shadow));
+}
+
+@keyframes folderPop {
+  0% { transform: translateY(0) scale(var(--folder-scale)); }
+  40% { transform: translateY(-6px) scale(calc(var(--folder-scale) * 1.05)); }
+  100% { transform: translateY(0) scale(var(--folder-scale)); }
+}
+
+.folder--just-activated {
+  animation: folderPop 0.4s ease;
+}
+
+@keyframes paperOpen1 {
+  from { opacity: 0; transform: translateY(10px) scale(0.75) rotate(-9.37deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(-9.37deg); }
+}
+@keyframes paperOpen2 {
+  from { opacity: 0; transform: translateY(10px) scale(0.75) rotate(7.11deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(7.11deg); }
+}
+@keyframes paperOpen3 {
+  from { opacity: 0; transform: translateY(10px) scale(0.75) rotate(-4.96deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(-4.96deg); }
+}
+
+.folder--just-activated .folder__card--1 {
+  animation: paperOpen1 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s backwards;
+}
+.folder--just-activated .folder__card--2 {
+  animation: paperOpen2 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s backwards;
+}
+.folder--just-activated .folder__card--3 {
+  animation: paperOpen3 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.19s backwards;
+}
+
+.folder__stack {
+  position: absolute;
+  inset: 0;
+  bottom: auto;
+  height: 163px;
+  background: var(--navy-deep);
+  -webkit-mask-image: url('assets/img/card-union-blue.svg');
+  mask-image: url('assets/img/card-union-blue.svg');
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.folder--active .folder__stack {
+  background: var(--orange);
+  -webkit-mask-image: url('assets/img/card-union-orange.svg');
+  mask-image: url('assets/img/card-union-orange.svg');
+}
+
+.folder__base {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 92px;
+  border-radius: 0 0 13px 13px;
+  background: #5a78b1;
+}
+
+.folder--active .folder__base {
+  background: linear-gradient(180deg, #da4f28 0%, #551b0b 100%);
+}
+
+.folder__papers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.folder__card {
+  position: absolute;
+  width: 71px;
+  height: 67px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: 8px;
+  background: #283f6b;
+}
+
+.folder__card span {
+  height: 3px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #556d9b;
+}
+
+.folder__card span:nth-child(2) { width: 46%; }
+.folder__card span:nth-child(4) { width: 76%; }
+.folder__card span:nth-child(5) { width: 62%; }
+
+.folder__card--1 { left: 21px; top: 35px; transform: rotate(-9.37deg); }
+.folder__card--2 {
+  left: 53px;
+  top: 53px;
+  transform: rotate(7.11deg);
+  box-shadow: 0 -1px 2px var(--navy-deep);
+}
+.folder__card--3 {
+  left: 91px;
+  top: 42px;
+  width: 87px;
+  transform: rotate(-4.96deg);
+  box-shadow: 0 -1px 2px var(--navy-deep);
+}
+
+.folder--active .folder__card {
+  background: #ffd2c6;
+}
+
+.folder--active .folder__card span {
+  background: #ffac94;
+}
+
+.folder--active .folder__card--2,
+.folder--active .folder__card--3 {
+  box-shadow: 0 -1px 2px rgba(179, 64, 32, 0.16);
+}
+
+.folder__num {
+  position: absolute;
+  left: 13px;
+  top: 124px;
+  font-size: 14px;
+  opacity: 0.4;
+}
+
+.folder__name {
+  position: absolute;
+  left: 13px;
+  top: 99px;
+  font-family: 'Kangmas', serif;
+  font-size: 22px;
+}
+
+.folder__arrow {
+  position: absolute;
+  right: 16px;
+  top: 102px;
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- Canvas (center) ---------- */
+
+.canvas {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  margin-left: 61px;
+  background: var(--cream);
+  border-radius: 44px;
+  box-shadow: 0 8px 0 var(--navy-shadow);
+  overflow: hidden;
+  color: var(--tan-text);
+}
+
+.canvas__viewport {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: auto;
+  cursor: default;
+}
+
+.canvas__viewport.is-hand-tool {
+  cursor: grab;
+}
+
+.canvas__viewport.is-panning {
+  cursor: grabbing;
+}
+
+.canvas__world {
+  position: relative;
+  width: 5000px;
+  height: 5000px;
+}
+
+.canvas__title {
+  position: absolute;
+  left: 40px;
+  top: 40px;
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 56px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.note {
+  position: absolute;
+  z-index: 1;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+  padding: 28px;
+  border-radius: 32px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.13);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition: box-shadow 0.15s ease, filter 0.15s ease, transform 0.25s ease;
+}
+
+/* A small strip of "washi tape" holding the note down, poking past the
+   top edge. */
+.note__tape {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  width: 64px;
+  height: 26px;
+  margin-left: -32px;
+  border-radius: 2px;
+  transform: rotate(-3deg);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.note--1 .note__tape { background: rgba(217, 77, 39, 0.55); }
+.note--2 .note__tape { left: 30%; background: rgba(120, 160, 255, 0.4); transform: rotate(3deg); }
+.note--3 .note__tape { left: 65%; background: rgba(234, 222, 200, 0.75); transform: rotate(-2deg); }
+.note--4 .note__tape { left: 40%; background: rgba(217, 77, 39, 0.4); transform: rotate(2.5deg); }
+.note--5 .note__tape { left: 60%; background: rgba(42, 78, 177, 0.5); transform: rotate(-3.5deg); }
+
+.note:hover {
+  /* The board still randomizes each note's resting angle inline (untouched
+     here) - hovering just settles it about halfway back toward level and
+     lifts it, rather than snapping fully straight (too jarring on the
+     more tilted notes). The !important is required to win over that
+     inline rotate(). Each note--N gets its own halved angle below, since
+     there's no single value that works for every note's base tilt.
+     No z-index bump here on purpose - notes overlap each other on the
+     board, and jumping a hovered note above its neighbors flip-flopped
+     the stacking order as the cursor moved between them. Leaving stacking
+     at its resting order (see .note's base z-index) means a lifted card
+     can occasionally tuck partly under a neighbor, which reads better
+     than that flicker. */
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22);
+  filter: brightness(1.03);
+}
+
+.note--1:hover { transform: rotate(4.6deg) translateY(-8px) !important; }
+.note--2:hover { transform: rotate(-6.6deg) translateY(-8px) !important; }
+.note--3:hover { transform: rotate(3.1deg) translateY(-8px) !important; }
+.note--4:hover { transform: rotate(-5.6deg) translateY(-8px) !important; }
+.note--5:hover { transform: rotate(-3deg) translateY(-8px) !important; }
+
+.note.is-dragging {
+  cursor: grabbing;
+  z-index: 10;
+  transition: none;
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.28);
+}
+
+.note__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.note--tan { background: var(--tan-card); }
+.note--blue { background: var(--blue-card); color: #fff; }
+
+.note__meta {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.4;
+  letter-spacing: -0.14px;
+}
+
+.note__text {
+  font-family: 'Kangmas', serif;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: 0.28px;
+}
+
+.note--tan .note__text span { color: rgba(55, 55, 55, 0.4); }
+.note--blue .note__text span { color: rgba(255, 255, 255, 0.3); }
+
+.badge {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border: 1.5px solid rgba(55, 55, 55, 0.1);
+  border-radius: 99px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.badge--dark {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.avatar-stack {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  border: 2.5px solid #373737;
+  overflow: hidden;
+  margin-right: -16px;
+}
+
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.avatar--solo { margin-right: 0; }
+
+.avatar--counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tan-card);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 10px;
+  margin-right: 0;
+}
+
+.note--blue .avatar { border-color: #16213e; }
+
+.toolbar {
+  position: absolute;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 20px;
+  background: #efe9df;
+  border: 2px solid var(--navy-deep);
+  border-radius: 51px;
+  box-shadow: 0 4px 0 var(--navy-deep);
+  z-index: 2;
+}
+
+.toolbar__icon { width: 24px; height: 24px; }
+.toolbar__icon--flip { transform: scaleY(-1); }
+
+.toolbar__tool {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background-color 0.15s ease;
+}
+
+.toolbar__tool:hover {
+  background: rgba(18, 36, 70, 0.08);
+}
+
+.toolbar__tool--active {
+  background: rgba(18, 36, 70, 0.12);
+}
+
+.toolbar__divider {
+  width: 2px;
+  height: 25px;
+  background: rgba(18, 36, 70, 0.1);
+}
+
+/* ---------- Right: events panel ---------- */
+
+.events-col {
+  flex-shrink: 0;
+  width: 411px;
+  margin-left: 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.user-account {
+  width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--navy-deep);
+  border-radius: 44px;
+  box-shadow: 0 8px 0 var(--navy-shadow);
+}
+
+.user-account__info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.user-account__avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 2px solid var(--navy-shadow);
+  overflow: hidden;
+}
+.user-account__avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.user-account__text { color: #fff; min-width: 0; }
+
+.user-account__name {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.15;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-account__role {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.4;
+  letter-spacing: -0.14px;
+  margin-top: 2px;
+}
+
+.user-account__menu {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 38px;
+  background: rgba(186, 179, 177, 0.05);
+  transition: background-color 0.15s ease;
+}
+
+.user-account__menu:hover { background: rgba(186, 179, 177, 0.12); }
+.user-account__menu img { width: 16px; height: 16px; }
+
+.events {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 28px;
+  background: var(--grey-panel);
+  border-radius: 44px;
+  box-shadow: 0 8px 0 var(--navy-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: var(--tan-text);
+  overflow-y: auto;
+}
+
+.events__title {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 36px;
+}
+
+.events__tabs-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.events__tabs-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, rgba(186, 179, 177, 0), var(--grey-panel));
+  pointer-events: none;
+}
+
+.events__tabs {
+  display: flex;
+  gap: 16px;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.4px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+
+.events__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.events__tabs .events__tab {
+  flex-shrink: 0;
+}
+
+.events__tab {
+  color: rgba(55, 55, 55, 0.6);
+  transition: color 0.15s ease;
+}
+.events__tab--active { color: var(--tan-text); }
+.events__tab:hover { color: var(--tan-text); }
+
+.events__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.event {
+  position: relative;
+  width: 100%;
+  border-radius: 28px;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+/* "…" menu on hover - move a session into a folder. Same look as the
+   folder options menu, just attached to an event card instead. */
+.event-menu-trigger {
+  /* Sits just left of the star, not stacked on top of it - both live in
+     that same top-right corner otherwise. */
+  position: absolute;
+  top: 9px;
+  right: 52px;
+  z-index: 3;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.18);
+  color: #fff;
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.event:not(.event--featured) .event-menu-trigger { color: #201c1d; background: rgba(0, 0, 0, 0.08); }
+.event-menu-trigger:hover { background: rgba(0, 0, 0, 0.3); }
+.event:not(.event--featured) .event-menu-trigger:hover { background: rgba(0, 0, 0, 0.14); }
+
+/* Notes don't have a star competing for the corner (that was removed from
+   them), so their "…" goes back to sitting right in the corner instead of
+   offset to make room for something that isn't there. */
+.note .event-menu-trigger {
+  top: 10px;
+  right: 10px;
+  color: #201c1d;
+  background: rgba(0, 0, 0, 0.1);
+}
+.note .event-menu-trigger:hover { background: rgba(0, 0, 0, 0.18); }
+.note--blue .event-menu-trigger { color: #fff; background: rgba(255, 255, 255, 0.14); }
+.note--blue .event-menu-trigger:hover { background: rgba(255, 255, 255, 0.25); }
+
+.event:hover .event-menu-trigger,
+.note:hover .event-menu-trigger,
+.modal__cal-event:hover .event-menu-trigger,
+.event-menu-trigger.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.event-menu-dropdown {
+  position: absolute;
+  top: 34px;
+  right: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 14px;
+  background: #efe9df;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.event-menu-dropdown__label {
+  padding: 6px 10px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(32, 28, 29, 0.4);
+}
+
+.event-menu-dropdown button {
+  padding: 8px 10px;
+  border-radius: 9px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  color: #201c1d;
+  transition: background-color 0.15s ease;
+}
+
+.event-menu-dropdown button:hover { background: rgba(0, 0, 0, 0.06); }
+.event-menu-dropdown button.is-current { color: var(--orange-shadow); }
+
+.event--featured {
+  background: var(--blue-card);
+  color: #fff;
+  border: 2px solid var(--navy-deep);
+  box-shadow: 0 2px 0 var(--navy-deep);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.event--featured:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 var(--navy-deep);
+}
+
+.event:not(.event--featured) {
+  background: var(--tan-bg);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.13);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event:not(.event--featured):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
+  filter: brightness(1.02);
+}
+
+.event--draft {
+  background: #efe6db;
+  border: 2px dashed var(--orange);
+}
+
+.event__draft-badge {
+  flex-shrink: 0;
+  background: var(--orange);
+  color: var(--cream);
+  padding: 3px 8px;
+  border-radius: 40px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.tag--draft {
+  background: rgba(217, 77, 39, 0.16);
+  color: var(--orange-shadow);
+}
+
+.event__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.event__head h3 {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 28px;
+}
+
+.event:not(.event--featured) .event__head h3 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.18px;
+}
+
+/* One star everywhere (events, notes) instead of star-on-one-card /
+   flag-on-the-rest - click toggles it, same component either place.
+   (Re-added - this rule got dropped by an external edit to this file.) */
+.card-star {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: rgba(55, 55, 55, 0.4);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.card-star:hover { transform: scale(1.12); }
+.card-star.is-starred { color: var(--orange); }
+
+.event--featured .card-star { color: rgba(255, 255, 255, 0.65); }
+.event--featured .card-star.is-starred { color: #fff; }
+
+.event__desc {
+  font-size: 14px;
+  color: rgba(55, 55, 55, 0.47);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event__quote {
+  position: relative;
+  height: 64px;
+}
+
+.event__quote-avatar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 99px;
+  border: 1.5px solid var(--blue-card);
+  overflow: hidden;
+}
+
+.event__quote-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.event__quote-lines {
+  position: absolute;
+  left: 48px;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.event__vector {
+  position: absolute;
+  left: -13px;
+  top: 10px;
+  width: 14px;
+  height: 8px;
+  z-index: 1;
+}
+
+.event__pill {
+  display: inline-block;
+  background: #f56c46;
+  color: var(--navy-deep);
+  padding: 4px 8px;
+  border-radius: 40px;
+  font-size: 16px;
+  line-height: 1.3;
+  width: fit-content;
+}
+
+/* The orange pill highlight is a "this is the featured/starred one" cue -
+   un-starring a card should stop calling out its quote text like that. */
+.event:not(.event--featured) .event__pill {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: 14px;
+}
+
+.event__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.event__duration {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px 4px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 44px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.event__time {
+  padding: 13px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 44px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Un-starring the featured card removes .event--featured, but its quote/
+   duration markup stays - give it a readable fallback for the plain tan
+   background instead of near-invisible white-on-white borders. */
+.event:not(.event--featured) .event__duration,
+.event:not(.event--featured) .event__time {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.avatar-stack--sm .avatar {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--blue-card);
+  margin-right: -8px;
+}
+.avatar-stack--sm .avatar:last-child { margin-right: 0; }
+
+.avatar-stack--xs .avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 14px;
+  border: 1.5px solid #efe7db;
+  margin-right: -8px;
+}
+.avatar-stack--xs .avatar:last-child { margin-right: 0; }
+
+.event__tags {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.tag {
+  padding: 4px 8px;
+  background: rgba(187, 190, 193, 0.53);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #201c1d;
+}
+
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px 12px 16px;
+  background: var(--orange);
+  border: 2px solid var(--orange-shadow);
+  border-radius: 128px;
+  box-shadow: 0 4px 0 var(--orange-shadow);
+  color: var(--cream);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.32px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.cta:hover {
+  background: #e35a35;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--orange-shadow);
+}
+
+.cta:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 var(--orange-shadow);
+}
+
+.cta img { width: 24px; height: 24px; }
+
+/* ---------- "Create new session" modal ---------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.modal[hidden] { display: none; }
+.modal__calendar[hidden] { display: none; }
+.modal__before[hidden] { display: none; }
+.modal__meet[hidden] { display: none; }
+.modal__recap[hidden] { display: none; }
+[hidden] { display: none !important; }
+
+.modal.is-open { opacity: 1; }
+
+.modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(32, 28, 29, 0.7);
+}
+
+.modal__close {
+  position: fixed;
+  top: 32px;
+  right: 32px;
+  z-index: 2;
+  width: 64px;
+  height: 64px;
+  border: 2px dashed #dfcfb2;
+  border-radius: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.modal__close:hover { background: rgba(255, 255, 255, 0.08); }
+.modal__close img { width: 28px; height: 28px; }
+
+.modal__body {
+  position: relative;
+}
+
+.modal__wrap {
+  position: relative;
+  z-index: 1;
+  width: 737px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 36px;
+  transform-origin: bottom center;
+  transform: translateY(140px) scale(0.9) rotate(-1.5deg);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal.is-open .modal__wrap {
+  transform: translateY(0) scale(1) rotate(0deg);
+}
+
+/* Two decorative tab shapes, sitting behind the card and only showing
+   through the small notch cut into the card's own top-left corner -
+   like extra folder tabs stacked underneath the "Prepare" flap. */
+.modal__tab {
+  position: absolute;
+  top: 36px;
+  z-index: 0;
+  height: 113px;
+  width: auto;
+}
+
+.modal__tab--1 { left: 213px; }
+.modal__tab--2 { left: 97px; }
+
+.modal__card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-height: calc(90vh - 100px);
+  overflow-y: auto;
+  background: var(--tan-card);
+  -webkit-mask-image: url('assets/img/modal-card-shape.svg');
+  mask-image: url('assets/img/modal-card-shape.svg');
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  padding: 82px 32px 56px;
+  filter: drop-shadow(0 8px 0 var(--navy-shadow));
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  color: var(--tan-text);
+}
+
+.modal__before {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+}
+
+.modal__step {
+  position: absolute;
+  left: 32px;
+  top: 15px;
+  z-index: 1;
+  font-weight: 700;
+  font-size: 20px;
+  color: #201c1d;
+}
+
+.modal__title {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 44px;
+  color: #201c1d;
+}
+
+.modal__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal__field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--cream);
+  border-radius: 28px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.13);
+  cursor: text;
+}
+
+.modal__person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: var(--tan-bg);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.13);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal__person:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
+}
+
+.modal__person-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.modal__person-info { flex: 1; min-width: 0; }
+
+.modal__person-name {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--tan-text);
+}
+
+.modal__person-role {
+  font-size: 12px;
+  color: rgba(55, 55, 55, 0.6);
+  margin-top: 2px;
+}
+
+.modal__person.is-added .modal__cal-add {
+  border-style: solid;
+  background: rgba(32, 28, 29, 0.08);
+}
+
+.modal__field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.modal__field-row--top { align-items: flex-start; }
+
+.modal__field-label {
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.24px;
+  color: #201c1d;
+  opacity: 0.4;
+  flex: 1;
+}
+
+.modal__field-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 24px;
+  color: #201c1d;
+}
+
+.modal__field-input::placeholder {
+  color: rgba(32, 28, 29, 0.4);
+  opacity: 1;
+}
+
+.modal__field-input--people {
+  resize: none;
+  overflow: hidden;
+  line-height: 1.3;
+  padding-top: 4px;
+}
+
+.modal__field--message { flex: 1; min-height: 0; }
+.modal__field-input--textarea {
+  flex: 1;
+  min-height: 120px;
+  resize: none;
+}
+
+/* ---------- Confirm dialog (delete folder, etc.) - a plain card, not the
+   folded-paper modal shell (that shape is sized for much bigger content
+   and distorts badly this small). ---------- */
+
+.confirm-modal__card {
+  position: relative;
+  z-index: 1;
+  width: 480px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 40px;
+  border-radius: 32px;
+  background: var(--tan-card);
+  filter: drop-shadow(0 8px 0 var(--navy-shadow));
+  color: var(--tan-text);
+  transform: translateY(24px) scale(0.94);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.confirm-modal.is-open .confirm-modal__card {
+  transform: translateY(0) scale(1);
+}
+
+.confirm-modal__title {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: #201c1d;
+}
+
+.confirm-modal__message {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(32, 28, 29, 0.6);
+}
+
+.confirm-modal__actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* ---------- "New folder" modal ---------- */
+
+.modal__field--move {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal__field--move.is-disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.modal__field-static {
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.24px;
+  color: #201c1d;
+  flex: 1;
+}
+
+.modal__pill--icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.modal__pill--icon img { width: 16px; height: 16px; transition: transform 0.15s ease; }
+.modal__pill--icon.is-open img { transform: rotate(180deg); }
+.modal__field--move.is-disabled .modal__pill--icon { cursor: not-allowed; }
+
+.modal__move-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1.5px solid rgba(32, 28, 29, 0.1);
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.modal__move-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #201c1d;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__move-row:hover { background: rgba(32, 28, 29, 0.06); }
+.modal__move-row input { width: 16px; height: 16px; accent-color: var(--orange); flex-shrink: 0; }
+
+.modal__create-folder {
+  width: 100%;
+  border: 2px solid var(--orange-shadow);
+  border-radius: 128px;
+  padding: 20px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.32px;
+  color: var(--cream);
+  background: var(--orange);
+  box-shadow: 0 4px 0 var(--orange-shadow);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.modal__create-folder:hover:not(:disabled) {
+  background: #e35a35;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--orange-shadow);
+}
+
+.modal__create-folder:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 var(--orange-shadow);
+}
+
+.modal__create-folder:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.modal__pill {
+  flex-shrink: 0;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 12px 20px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.28px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__pill:hover { background: rgba(32, 28, 29, 0.06); }
+
+.modal__pill.has-value {
+  border-style: solid;
+  background: rgba(32, 28, 29, 0.08);
+}
+
+.modal__pill:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.modal__pill:disabled:hover { background: transparent; }
+
+.modal__date {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.modal__date-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+.modal__continue {
+  width: 100%;
+  padding: 20px 44px;
+  border: none;
+  border-radius: 128px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.32px;
+  background: rgba(18, 36, 70, 0.17);
+  color: rgba(32, 28, 29, 0.35);
+  cursor: not-allowed;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal__continue.is-ready {
+  background: var(--orange);
+  color: var(--cream);
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--orange-shadow);
+}
+
+.modal__continue.is-ready:hover {
+  background: #e35a35;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--orange-shadow);
+}
+
+/* ---------- "Pick date" side panel: same agenda as the main board ---------- */
+
+.modal__calendar {
+  position: absolute;
+  z-index: 1;
+  left: calc(100% + 34px);
+  top: 36px;
+  height: calc(100% - 36px);
+  width: 380px;
+  max-width: 92vw;
+  overflow-y: auto;
+  padding: 28px;
+  background: var(--grey-panel);
+  border-radius: 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: var(--tan-text);
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal__calendar.is-open {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.modal__calendar-title {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 32px;
+}
+
+.modal__calendar-tabs {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-weight: 700;
+  font-size: 16px;
+  color: rgba(55, 55, 55, 0.6);
+}
+
+.modal__calendar-tab { transition: color 0.15s ease; }
+.modal__calendar-tab--active { color: var(--tan-text); }
+.modal__calendar-tab:hover { color: var(--tan-text); }
+
+.modal__calendar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal__cal-event {
+  position: relative;
+  border-radius: 24px;
+  padding: 18px;
+  background: var(--tan-bg);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.13);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Calendar events don't have a star either, so their "…" sits in the
+   corner like a note's does rather than offset for a star. */
+.modal__cal-event .event-menu-trigger {
+  top: 10px;
+  right: 10px;
+  color: #201c1d;
+  background: rgba(0, 0, 0, 0.1);
+}
+.modal__cal-event .event-menu-trigger:hover { background: rgba(0, 0, 0, 0.18); }
+.modal__cal-event--featured .event-menu-trigger { color: #fff; background: rgba(255, 255, 255, 0.14); }
+.modal__cal-event--featured .event-menu-trigger:hover { background: rgba(255, 255, 255, 0.25); }
+
+.modal__cal-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
+}
+
+.modal__cal-event--featured {
+  background: var(--blue-card);
+  color: #fff;
+  border: 2px solid var(--navy-deep);
+  box-shadow: 0 2px 0 var(--navy-deep);
+}
+
+.modal__cal-event--selected {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+.modal__cal-event--featured:hover {
+  box-shadow: 0 4px 0 var(--navy-deep);
+}
+
+.modal__cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal__cal-head h3 {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 19px;
+}
+
+.modal__cal-add {
+  flex-shrink: 0;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 7px 14px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 12px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__cal-add:hover { background: rgba(32, 28, 29, 0.08); }
+
+.modal__cal-event--featured .modal__cal-add {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #fff;
+}
+
+.modal__cal-event--featured .modal__cal-add:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.modal__cal-body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.modal__cal-date {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.modal__cal-day {
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: -1px;
+}
+
+.modal__cal-month {
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.modal__cal-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.modal__cal-time { background: rgba(187, 190, 193, 0.53); }
+.modal__cal-event--featured .modal__cal-time {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+/* ---------- "Meeting" screen: recording in progress ---------- */
+
+.modal__meet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  text-align: center;
+  padding-top: 8px;
+}
+
+.modal__intention-badge {
+  background: #201c1d;
+  color: #dfcfb2;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.modal__intention-text {
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.35;
+  color: #201c1d;
+  max-width: 560px;
+}
+
+.modal__waveform {
+  position: relative;
+  width: min(100%, 620px);
+  height: clamp(190px, 27vh, 250px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal__waveform-blob {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.modal__waveform-blob.is-paused { animation-play-state: paused; }
+
+/* Sits next to the "Listening" pill, not on top of the wave - the wave is
+   a thin streak, not a filled blob, so a centered button used to hide the
+   most active part of it. */
+.modal__status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal__waveform-pause {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #201c1d;
+  color: #eadec8;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.modal__waveform-pause:hover { transform: scale(1.06); }
+
+.modal__listening-pill {
+  background: #cfc1a6;
+  color: #201c1d;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.modal__meet-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.modal__minimize {
+  flex-shrink: 0;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 20px 32px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__minimize:hover { background: rgba(32, 28, 29, 0.06); }
+
+.modal__end-session {
+  flex: 1;
+  border: 2px solid var(--orange-shadow);
+  border-radius: 128px;
+  padding: 20px 44px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--cream);
+  background: var(--orange);
+  box-shadow: 0 4px 0 var(--orange-shadow);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal__end-session:hover {
+  background: #e35a35;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--orange-shadow);
+}
+
+.modal__end-session:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 var(--orange-shadow);
+}
+
+/* Standalone "Start session" button - same look as End session, but full
+   width on its own instead of flex:1 sharing a row with Minimize. */
+.modal__start-session {
+  width: 100%;
+}
+
+/* ---------- "Compare" screen: recap chat / transcript, shown after End session ---------- */
+
+.modal__recap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* While the recap step is showing, the CARD itself stops scrolling - only
+   the cream body inside it does, so the title/tabs stay put and the
+   scrollbar lives inside the cream box instead of on the card's edge. */
+.modal__card.is-recap {
+  overflow: hidden;
+}
+
+.modal__card.is-recap .modal__recap {
+  flex: 1;
+  min-height: 0;
+}
+
+
+.modal__recap-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.modal__recap-tab {
+  border: 2px dashed rgba(55, 55, 55, 0.14);
+  border-radius: 128px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  color: #373737;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.modal__recap-tab.is-active { border-color: var(--orange); }
+.modal__recap-tab:hover { border-color: rgba(55, 55, 55, 0.35); }
+.modal__recap-tab.is-active:hover { border-color: var(--orange); }
+
+.modal__recap-body {
+  flex: 1;
+  min-height: 0;
+  background: var(--cream);
+  border-radius: 28px;
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+.modal__recap-pane[hidden] { display: none; }
+
+.modal__recap-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal__recap-summary {
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.4;
+  color: rgba(32, 28, 29, 0.4);
+}
+
+.modal__recap-bubble {
+  align-self: flex-start;
+  max-width: 85%;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.4;
+  padding: 14px 18px;
+  border-radius: 20px;
+  color: #201c1d;
+  background: rgba(32, 28, 29, 0.06);
+}
+
+.modal__recap-bubble--user {
+  align-self: flex-end;
+  color: var(--cream);
+  background: #201c1d;
+}
+
+.modal__recap-highlight {
+  color: #201c1d;
+  /* Two layers: a flat fill, plus a repeating dash pattern pinned to the
+     bottom edge (instead of border-bottom: dashed) so the dashes can be
+     animated by sliding their background-position. */
+  background-image:
+    linear-gradient(rgba(32, 28, 29, 0.08), rgba(32, 28, 29, 0.08)),
+    repeating-linear-gradient(to right, var(--orange) 0 5px, transparent 5px 10px);
+  background-size: 100% 100%, 10px 2px;
+  background-position: 0 0, 0 100%;
+  background-repeat: no-repeat, repeat-x;
+  border-radius: 4px;
+  padding: 0 2px 2px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__recap-highlight:hover {
+  background-image:
+    linear-gradient(rgba(217, 77, 39, 0.18), rgba(217, 77, 39, 0.18)),
+    repeating-linear-gradient(to right, var(--orange) 0 5px, transparent 5px 10px);
+  animation: recap-highlight-march 0.6s linear infinite;
+}
+
+@keyframes recap-highlight-march {
+  to { background-position: 0 0, 10px 100%; }
+}
+
+.modal__recap-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal__recap-chip {
+  border: none;
+  border-radius: 128px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  color: #373737;
+  background: rgba(55, 55, 55, 0.14);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__recap-chip:hover { background: rgba(55, 55, 55, 0.22); }
+
+.modal__recap-transcript {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal__recap-msg {
+  display: flex;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.modal__recap-msg-time-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.modal__recap-msg-time {
+  border: 2px solid rgba(55, 55, 55, 0.14);
+  border-radius: 128px;
+  padding: 8px 12px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #373737;
+  white-space: nowrap;
+}
+
+.modal__recap-msg-line {
+  width: 2px;
+  flex: 1;
+  min-height: 20px;
+  background: rgba(55, 55, 55, 0.14);
+  margin-top: 4px;
+}
+
+.modal__recap-msg-body {
+  flex: 1;
+  min-width: 0;
+  padding-top: 7px;
+  padding-bottom: 24px;
+}
+
+.modal__recap-msg-meta {
+  display: flex;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(32, 28, 29, 0.38);
+  margin-bottom: 6px;
+}
+
+.modal__recap-msg-text {
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.4;
+  color: #201c1d;
+}
+
+.modal__recap-ask {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.modal__recap-ask[hidden] { display: none; }
+
+.modal__recap-ask-input {
+  flex: 1;
+  min-width: 0;
+  border: 2px solid #201c1d;
+  border-radius: 128px;
+  padding: 20px 32px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: #201c1d;
+  background: transparent;
+}
+
+.modal__recap-ask-input::placeholder { color: rgba(32, 28, 29, 0.35); }
+
+.modal__recap-speak {
+  flex-shrink: 0;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 20px 32px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__recap-speak:hover { background: rgba(32, 28, 29, 0.06); }
+
+.modal__recap-search {
+  width: 100%;
+  border: 2px solid #201c1d;
+  border-radius: 128px;
+  padding: 20px 32px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: rgba(32, 28, 29, 0.35);
+  background: transparent;
+}
+
+.modal__recap-search[hidden] { display: none; }
+
+/* ---------- Mini player: floats over the page, no dark overlay ---------- */
+
+.mini-player {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  z-index: 90;
+  width: 260px;
+  padding: 20px;
+  background: #d9d9d9;
+  border-radius: 32px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #201c1d;
+  opacity: 0;
+  transform: translateY(24px) scale(0.94);
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mini-player[hidden] { display: none; }
+
+.mini-player.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.mini-player__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mini-player__label {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.mini-player__recap {
+  flex-shrink: 0;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 12px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.mini-player__recap:hover { background: rgba(32, 28, 29, 0.08); }
+
+.mini-player__waveform {
+  position: relative;
+  height: 100px;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-player__blob {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.mini-player__blob.is-paused { animation-play-state: paused; }
+
+.mini-player__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mini-player__timer {
+  font-weight: 500;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-player__controls {
+  display: flex;
+  gap: 8px;
+}
+
+.mini-player__pause,
+.mini-player__stop {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.mini-player__pause:hover,
+.mini-player__stop:hover { transform: scale(1.06); }
+
+.mini-player__pause {
+  border: none;
+  background: #201c1d;
+}
+
+.mini-player__pause img { width: 16px; height: 16px; }
+
+.mini-player__stop {
+  border: 2px dashed var(--orange);
+  background: transparent;
+}
+
+.mini-player__stop img { width: 16px; height: 16px; }

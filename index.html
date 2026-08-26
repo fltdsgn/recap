@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>recap.</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="board">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <h1>recap.</h1>
+        <p>Design your soft skills</p>
+      </div>
+
+      <nav class="folder-list scroll-thin scroll-thin--light">
+        <div class="folder-item">
+          <button class="folder-new" type="button" id="folder-new-btn" title="Create new folder">
+            <span class="folder-new__shape"></span>
+            <span class="folder-new__label">Create<br>New Folder</span>
+          </button>
+        </div>
+
+        <div class="folder-item">
+          <button class="folder folder--active" data-folder="all">
+            <div class="folder__stack"></div>
+            <div class="folder__papers">
+              <div class="folder__card folder__card--1">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="folder__card folder__card--2">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="folder__card folder__card--3">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="folder__base"></div>
+            <span class="folder__num">01</span>
+            <span class="folder__name">All meets</span>
+            <img class="folder__arrow" src="assets/img/icon-arrow-up-right.svg" alt="">
+          </button>
+        </div>
+
+        <div class="folder-item">
+          <button class="folder" data-folder="wannabe">
+            <div class="folder__stack"></div>
+            <div class="folder__papers">
+              <div class="folder__card folder__card--1">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="folder__card folder__card--2">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="folder__card folder__card--3">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="folder__base"></div>
+            <span class="folder__num">02</span>
+            <span class="folder__name">WannaBe</span>
+            <img class="folder__arrow" src="assets/img/icon-arrow-up-right.svg" alt="">
+          </button>
+        </div>
+
+        <div class="folder-item">
+          <button class="folder" data-folder="tefs">
+            <div class="folder__stack"></div>
+            <div class="folder__papers">
+              <div class="folder__card folder__card--1">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="folder__base"></div>
+            <span class="folder__num">03</span>
+            <span class="folder__name">Tefs</span>
+            <img class="folder__arrow" src="assets/img/icon-arrow-up-right.svg" alt="">
+          </button>
+        </div>
+
+        <div class="folder-item">
+          <button class="folder" data-folder="cashiron">
+            <div class="folder__stack"></div>
+            <div class="folder__papers">
+              <div class="folder__card folder__card--1">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="folder__card folder__card--2">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="folder__base"></div>
+            <span class="folder__num">04</span>
+            <span class="folder__name">Cashiron</span>
+            <img class="folder__arrow" src="assets/img/icon-arrow-up-right.svg" alt="">
+          </button>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Center: infinite sticky-note board -->
+    <main class="canvas">
+      <div class="canvas__viewport scroll-thin">
+        <div class="canvas__world">
+
+          <div class="note note--tan note--1" data-folder="wannabe" data-x="2296" data-y="2345" style="transform: rotate(9.28deg);">
+            <span class="note__tape"></span>
+            <div class="avatar-stack">
+              <div class="avatar"><img src="assets/img/avatar-1.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-2.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-3.png" alt=""></div>
+              <div class="avatar avatar--counter">+2</div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 22 · 13:00 AM</p>
+              <p class="note__text">Users understand <span>the feature, but don't see</span> why they need it yet</p>
+              <span class="badge">WannaBe</span>
+            </div>
+          </div>
+
+          <div class="note note--tan note--2" data-folder="wannabe" data-x="2399" data-y="2435" style="transform: rotate(-13.19deg);">
+            <span class="note__tape"></span>
+            <div class="avatar-stack">
+              <div class="avatar avatar--solo"><img src="assets/img/avatar-1.png" alt=""></div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 18 · 3:00 PM</p>
+              <p class="note__text">Keep the hero simpler <span>and move proof points</span> higher</p>
+              <span class="badge">WannaBe</span>
+            </div>
+          </div>
+
+          <div class="note note--tan note--3" data-folder="wannabe" data-x="2810" data-y="2105" style="transform: rotate(6.12deg);">
+            <span class="note__tape"></span>
+            <div class="avatar-stack">
+              <div class="avatar avatar--solo"><img src="assets/img/avatar-1.png" alt=""></div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 18 · 3:00 PM</p>
+              <p class="note__text">Keep the interaction, <span>but simplify the animation states</span></p>
+              <span class="badge">WannaBe</span>
+            </div>
+          </div>
+
+          <div class="note note--tan note--4" data-folder="tefs" data-x="2137" data-y="2790" style="transform: rotate(-11.2deg);">
+            <span class="note__tape"></span>
+            <div class="avatar-stack">
+              <div class="avatar"><img src="assets/img/avatar-1.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-2.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-3.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 6 · 5:00 PM</p>
+              <p class="note__text">Show the decision-<span>making earlier, not only the</span> final UI</p>
+              <span class="badge">Tefs</span>
+            </div>
+          </div>
+
+          <div class="note note--tan note--5" data-folder="cashiron" data-x="2750" data-y="2700" style="transform: rotate(-6deg);">
+            <span class="note__tape"></span>
+            <div class="avatar-stack">
+              <div class="avatar avatar--solo"><img src="assets/img/avatar-3.png" alt=""></div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 12 · 11:00 AM</p>
+              <p class="note__text">Track the churn number <span>weekly, not just at the</span> end of the month</p>
+              <span class="badge">Cashiron</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <h2 class="canvas__title">All meets</h2>
+
+      <div class="toolbar">
+        <button class="toolbar__tool toolbar__tool--active" data-tool="select" title="Select">
+          <img src="assets/img/icon-pointer.svg" alt="select" class="toolbar__icon">
+        </button>
+        <button class="toolbar__tool" data-tool="pan" title="Hand tool (pan)">
+          <img src="assets/img/icon-hand.svg" alt="pan" class="toolbar__icon">
+        </button>
+        <img src="assets/img/icon-file.svg" alt="file" class="toolbar__icon toolbar__icon--flip" hidden>
+        <img src="assets/img/icon-smile.svg" alt="smile" class="toolbar__icon" hidden>
+        <span class="toolbar__divider" hidden></span>
+        <img src="assets/img/icon-search.svg" alt="search" class="toolbar__icon" hidden>
+        <img src="assets/img/icon-filter.svg" alt="filter" class="toolbar__icon" hidden>
+      </div>
+    </main>
+
+    <!-- Right: upcoming events -->
+    <div class="events-col">
+    <div class="user-account">
+      <div class="user-account__info">
+        <div class="user-account__avatar"><img src="assets/img/avatar-profile.png" alt=""></div>
+        <div class="user-account__text">
+          <p class="user-account__name">Vasiliy Romanov</p>
+          <p class="user-account__role">Designer</p>
+        </div>
+      </div>
+      <button type="button" class="user-account__menu" title="Account menu">
+        <img src="assets/img/icon-chevron-down.svg" alt="">
+      </button>
+    </div>
+
+    <aside class="events scroll-thin">
+      <h2 class="events__title">Upcoming events</h2>
+
+      <div class="events__tabs-wrap">
+        <div class="events__tabs">
+          <button class="events__tab events__tab--active" data-tab="all">All</button>
+          <button class="events__tab" data-tab="today">Today</button>
+          <button class="events__tab" data-tab="tomorrow">Tomorrow</button>
+          <button class="events__tab" data-tab="30aug">30 Aug</button>
+          <button class="events__tab" data-tab="31aug">31 Aug</button>
+          <button class="events__tab" data-tab="1sen">1 Sen</button>
+          <button class="events__tab" data-tab="2sen">2 Sen</button>
+        </div>
+      </div>
+
+      <div class="events__list">
+        <article class="event event--featured" data-tab="today">
+          <div class="event__head">
+            <h3>Product Roadmap Alignment</h3>
+            <span class="card-star-slot" data-starred="true"></span>
+          </div>
+          <div class="event__quote">
+            <div class="event__quote-avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+            <div class="event__quote-lines">
+              <span class="event__pill">Keep the interaction, but</span>
+              <img class="event__vector" src="assets/img/icon-vector193.svg" alt="">
+              <span class="event__pill">simplify the animation states</span>
+            </div>
+          </div>
+          <div class="event__footer">
+            <div class="event__duration">
+              <div class="avatar-stack avatar-stack--sm">
+                <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+              </div>
+              <span>25min</span>
+            </div>
+            <span class="event__time">Today, 10:00 AM</span>
+          </div>
+        </article>
+
+        <article class="event" data-tab="tomorrow">
+          <div class="event__head">
+            <h3>Design Critique</h3>
+            <span class="card-star-slot"></span>
+          </div>
+          <p class="event__desc">Keep the interaction, but simplify the animation states</p>
+          <div class="event__footer">
+            <div class="event__tags">
+              <span class="tag">Tomorrow</span>
+              <span class="tag">3:30 PM</span>
+            </div>
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-7.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="event" data-tab="30aug">
+          <div class="event__head">
+            <h3>User Research Synthesis</h3>
+            <span class="card-star-slot"></span>
+          </div>
+          <p class="event__desc">Key insights around trust and onboarding.</p>
+          <div class="event__footer">
+            <div class="event__tags">
+              <span class="tag">30 Aug</span>
+              <span class="tag">2:00 PM</span>
+            </div>
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="event" data-tab="31aug">
+          <div class="event__head">
+            <h3>Call with Design Lead</h3>
+            <span class="card-star-slot"></span>
+          </div>
+          <p class="event__desc">Discussed component library updates and design tokens.</p>
+          <div class="event__footer">
+            <div class="event__tags">
+              <span class="tag">31 Aug</span>
+              <span class="tag">11:00 AM</span>
+            </div>
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="event" data-tab="1sen">
+          <div class="event__head">
+            <h3>Onboarding Walkthrough</h3>
+            <span class="card-star-slot"></span>
+          </div>
+          <p class="event__desc">Walk new hire through the design system basics.</p>
+          <div class="event__footer">
+            <div class="event__tags">
+              <span class="tag">1 Sen</span>
+              <span class="tag">9:00 AM</span>
+            </div>
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="event" data-tab="2sen">
+          <div class="event__head">
+            <h3>Sprint Retro</h3>
+            <span class="card-star-slot"></span>
+          </div>
+          <p class="event__desc">What worked, what didn't, what's next.</p>
+          <div class="event__footer">
+            <div class="event__tags">
+              <span class="tag">2 Sen</span>
+              <span class="tag">4:00 PM</span>
+            </div>
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-7.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </aside>
+
+      <button class="cta">
+        <img src="assets/img/icon-add.svg" alt="">
+        Create new session
+      </button>
+    </div>
+
+  </div>
+
+  <!-- "New folder" modal -->
+  <div class="modal" id="folder-modal" hidden>
+    <div class="modal__overlay" data-folder-modal-close></div>
+
+    <button class="modal__close" data-folder-modal-close title="Close">
+      <img src="assets/img/icon-close.svg" alt="">
+    </button>
+
+    <div class="modal__body">
+      <div class="modal__wrap">
+        <img class="modal__tab modal__tab--1" src="assets/img/modal-tab-1.svg" alt="">
+        <img class="modal__tab modal__tab--2" src="assets/img/modal-tab-2.svg" alt="">
+
+        <div class="modal__card">
+          <span class="modal__step">Create</span>
+          <h2 class="modal__title">New folder</h2>
+
+          <div class="modal__fields">
+            <label class="modal__field">
+              <div class="modal__field-row">
+                <input class="modal__field-input" type="text" id="folder-title-input" placeholder="Folder title">
+              </div>
+            </label>
+
+            <div class="modal__field modal__field--move" id="folder-move-field">
+              <div class="modal__field-row">
+                <span class="modal__field-input modal__field-static">Move existing sessions here</span>
+                <button type="button" class="modal__pill modal__pill--icon" id="folder-move-pill">
+                  <img src="assets/img/icon-chevron-down.svg" alt="">
+                </button>
+              </div>
+              <div class="modal__move-list" id="folder-move-list" hidden></div>
+            </div>
+          </div>
+
+          <button type="button" class="modal__create-folder" id="folder-create-btn" disabled>Create folder</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm dialog (delete folder, etc.) - site-styled, but a plain
+       card (not the folded-paper modal shell, which is sized for much
+       bigger content and distorts badly at this small a size). -->
+  <div class="modal confirm-modal" id="confirm-modal" hidden>
+    <div class="modal__overlay" data-confirm-cancel></div>
+
+    <div class="confirm-modal__card">
+      <h2 class="confirm-modal__title" id="confirm-modal-title">Are you sure?</h2>
+      <p class="confirm-modal__message" id="confirm-modal-message"></p>
+
+      <div class="confirm-modal__actions">
+        <button type="button" class="modal__minimize" id="confirm-modal-cancel">Cancel</button>
+        <button type="button" class="modal__end-session" id="confirm-modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- "Create new session" modal -->
+  <div class="modal" id="session-modal" hidden>
+    <div class="modal__overlay" data-modal-close></div>
+
+    <button class="modal__close" data-modal-close title="Close">
+      <img src="assets/img/icon-close.svg" alt="">
+    </button>
+
+    <div class="modal__body">
+    <div class="modal__wrap">
+      <img class="modal__tab modal__tab--1" src="assets/img/modal-tab-1.svg" alt="">
+      <img class="modal__tab modal__tab--2" src="assets/img/modal-tab-2.svg" alt="">
+
+      <div class="modal__card">
+        <span class="modal__step" id="modal-step-label">Prepare</span>
+
+        <div class="modal__before" id="modal-before">
+          <h2 class="modal__title">New session</h2>
+
+          <div class="modal__fields">
+            <label class="modal__field">
+              <div class="modal__field-row">
+                <input class="modal__field-input" type="text" id="modal-title-input" placeholder="Session title or topic">
+                <div class="modal__date">
+                  <button type="button" class="modal__pill" id="modal-date-pill">Pick date</button>
+                  <input type="date" class="modal__date-input" id="modal-date-input">
+                </div>
+              </div>
+            </label>
+
+            <div class="modal__field modal__field--people">
+              <div class="modal__field-row modal__field-row--top">
+                <textarea class="modal__field-input modal__field-input--people" id="modal-people-input" placeholder="Who are you meeting with?" rows="1"></textarea>
+                <button type="button" class="modal__pill" id="modal-people-pill">Select people</button>
+              </div>
+            </div>
+
+            <label class="modal__field modal__field--message">
+              <div class="modal__field-row modal__field-row--top">
+                <textarea class="modal__field-input modal__field-input--textarea" id="modal-message-input" placeholder="What do you want to communicate?"></textarea>
+                <button type="button" class="modal__pill">Speak</button>
+              </div>
+            </label>
+          </div>
+
+          <button type="button" class="modal__continue" id="modal-continue-btn" disabled>Continue</button>
+        </div>
+
+        <div class="modal__meet" id="modal-meet" hidden>
+          <span class="modal__intention-badge">Your intention</span>
+          <p class="modal__intention-text" id="modal-intention-text"></p>
+
+          <div class="modal__waveform">
+            <div class="modal__waveform-blob" id="modal-waveform-orb"></div>
+          </div>
+
+          <div class="modal__status-row">
+            <button type="button" class="modal__waveform-pause" id="modal-waveform-pause" hidden>
+              <svg id="modal-waveform-icon-pause" viewBox="0 0 24 24" width="20" height="20" fill="none">
+                <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/>
+                <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/>
+              </svg>
+              <svg id="modal-waveform-icon-play" viewBox="0 0 24 24" width="20" height="20" fill="none" hidden>
+                <path d="M6 4.2C6 3 7.3 2.3 8.4 2.9L19.5 9.7C20.6 10.4 20.6 12 19.5 12.6L8.4 19.5C7.3 20.1 6 19.3 6 18.1V4.2Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <span class="modal__listening-pill">Listening · <span id="modal-timer">00:00</span></span>
+          </div>
+
+          <button type="button" class="modal__end-session modal__start-session" id="modal-start-btn">Start session</button>
+
+          <div class="modal__meet-actions" id="modal-meet-actions" hidden>
+            <button type="button" class="modal__minimize" id="modal-minimize-btn">Minimize</button>
+            <button type="button" class="modal__end-session" id="modal-end-btn">End session</button>
+          </div>
+        </div>
+
+        <div class="modal__recap" id="modal-recap" hidden>
+          <h2 class="modal__title modal__recap-title" id="modal-recap-title">Product Roadmap Alignment</h2>
+
+          <div class="modal__recap-tabs">
+            <button type="button" class="modal__recap-tab is-active" data-recap-tab="chat">Chat</button>
+            <button type="button" class="modal__recap-tab" data-recap-tab="transcript">Transcript</button>
+          </div>
+
+          <div class="modal__recap-body scroll-thin">
+            <div class="modal__recap-pane" id="recap-pane-chat">
+              <div class="modal__recap-thread" id="recap-chat-thread">
+                <p class="modal__recap-summary">
+                  You planned to explain that the new navigation is simpler, reduces cognitive load, and should be tested before adding more features. In the meeting, you focused mostly on
+                  <span class="modal__recap-highlight">clarity and ease of use</span>, mentioned
+                  <span class="modal__recap-highlight">cognitive load</span> only briefly, and presented
+                  <span class="modal__recap-highlight">testing before adding more features</span> as a secondary point rather than the main argument.
+                </p>
+              </div>
+
+              <div class="modal__recap-chips" id="recap-chips">
+                <button type="button" class="modal__recap-chip">Navigation changes?</button>
+                <button type="button" class="modal__recap-chip">Testing?</button>
+                <button type="button" class="modal__recap-chip">Their reaction?</button>
+                <button type="button" class="modal__recap-chip">Next steps?</button>
+              </div>
+            </div>
+
+            <div class="modal__recap-pane" id="recap-pane-transcript" hidden>
+              <div class="modal__recap-transcript">
+                <article class="modal__recap-msg">
+                  <div class="modal__recap-msg-time-col">
+                    <span class="modal__recap-msg-time">10:02</span>
+                    <span class="modal__recap-msg-line"></span>
+                  </div>
+                  <div class="modal__recap-msg-body">
+                    <p class="modal__recap-msg-meta"><span>Olivia Chen</span><span>·</span><span>Design Lead</span></p>
+                    <p class="modal__recap-msg-text">Can you walk me through why you changed the navigation structure?</p>
+                  </div>
+                </article>
+
+                <article class="modal__recap-msg">
+                  <div class="modal__recap-msg-time-col">
+                    <span class="modal__recap-msg-time">10:03</span>
+                    <span class="modal__recap-msg-line"></span>
+                  </div>
+                  <div class="modal__recap-msg-body">
+                    <p class="modal__recap-msg-meta"><span>You</span><span>·</span><span>Product Designer</span></p>
+                    <p class="modal__recap-msg-text">The main goal was to make the hierarchy easier to understand. The previous version forced users to scan too many options at once.</p>
+                  </div>
+                </article>
+
+                <article class="modal__recap-msg">
+                  <div class="modal__recap-msg-time-col">
+                    <span class="modal__recap-msg-time">10:04</span>
+                    <span class="modal__recap-msg-line"></span>
+                  </div>
+                  <div class="modal__recap-msg-body">
+                    <p class="modal__recap-msg-meta"><span>Olivia Chen</span><span>·</span><span>Design Lead</span></p>
+                    <p class="modal__recap-msg-text">What makes you confident this version actually reduces cognitive load?</p>
+                  </div>
+                </article>
+
+                <article class="modal__recap-msg">
+                  <div class="modal__recap-msg-time-col">
+                    <span class="modal__recap-msg-time">10:05</span>
+                  </div>
+                  <div class="modal__recap-msg-body">
+                    <p class="modal__recap-msg-meta"><span>You</span><span>·</span><span>Product Designer</span></p>
+                    <p class="modal__recap-msg-text">There are fewer competing choices at each step, and related actions are grouped more clearly. It should make the flow easier to scan.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__recap-ask" id="recap-ask-row">
+            <input type="text" class="modal__recap-ask-input" id="recap-ask-input" placeholder="Ask about this session…">
+            <button type="button" class="modal__recap-speak">Speak</button>
+          </div>
+          <input type="text" class="modal__recap-search" id="recap-search-row" placeholder="Search transcript" hidden>
+        </div>
+      </div>
+    </div>
+
+    <aside class="modal__calendar scroll-thin" id="modal-calendar" hidden>
+      <h2 class="modal__calendar-title">Upcoming events</h2>
+
+      <div class="modal__calendar-list">
+        <article class="modal__cal-event modal__cal-event--featured"
+          data-date-tab="today" data-day="24" data-month="Aug"
+          data-title="Product Roadmap Alignment">
+          <div class="modal__cal-head">
+            <h3>Product Roadmap Alignment</h3>
+            <button type="button" class="modal__cal-add">Add</button>
+          </div>
+          <div class="modal__cal-body">
+            <div class="modal__cal-date">
+              <span class="modal__cal-day">24</span>
+              <span class="modal__cal-month">Aug</span>
+            </div>
+            <div class="modal__cal-meta">
+              <span class="tag modal__cal-time">3:30 PM</span>
+              <div class="avatar-stack avatar-stack--xs">
+                <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-7.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="modal__cal-event"
+          data-date-tab="tomorrow" data-day="25" data-month="Aug"
+          data-title="User Research Synthesis">
+          <div class="modal__cal-head">
+            <h3>User Research Synthesis</h3>
+            <button type="button" class="modal__cal-add">Add</button>
+          </div>
+          <div class="modal__cal-body">
+            <div class="modal__cal-date">
+              <span class="modal__cal-day">25</span>
+              <span class="modal__cal-month">Aug</span>
+            </div>
+            <div class="modal__cal-meta">
+              <span class="tag modal__cal-time">3:30 PM</span>
+              <div class="avatar-stack avatar-stack--xs">
+                <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="modal__cal-event"
+          data-date-tab="26aug" data-day="26" data-month="Aug"
+          data-title="Design Critique">
+          <div class="modal__cal-head">
+            <h3>Design Critique</h3>
+            <button type="button" class="modal__cal-add">Add</button>
+          </div>
+          <div class="modal__cal-body">
+            <div class="modal__cal-date">
+              <span class="modal__cal-day">26</span>
+              <span class="modal__cal-month">Aug</span>
+            </div>
+            <div class="modal__cal-meta">
+              <span class="tag modal__cal-time">11:30 AM</span>
+              <div class="avatar-stack avatar-stack--xs">
+                <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="modal__cal-event"
+          data-date-tab="27aug" data-day="27" data-month="Aug"
+          data-title="Call with Design Lead">
+          <div class="modal__cal-head">
+            <h3>Call with Design Lead</h3>
+            <button type="button" class="modal__cal-add">Add</button>
+          </div>
+          <div class="modal__cal-body">
+            <div class="modal__cal-date">
+              <span class="modal__cal-day">27</span>
+              <span class="modal__cal-month">Aug</span>
+            </div>
+            <div class="modal__cal-meta">
+              <span class="tag modal__cal-time">3:30 PM</span>
+              <div class="avatar-stack avatar-stack--xs">
+                <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </aside>
+
+    <aside class="modal__calendar modal__people scroll-thin" id="modal-people-panel" hidden>
+      <h2 class="modal__calendar-title">Select people</h2>
+
+      <div class="modal__calendar-list">
+        <article class="modal__person" data-name="Olivia Chen" data-role="Design Lead">
+          <img class="modal__person-avatar" src="assets/img/avatar-1.png" alt="">
+          <div class="modal__person-info">
+            <p class="modal__person-name">Olivia Chen</p>
+            <p class="modal__person-role">Design Lead</p>
+          </div>
+          <button type="button" class="modal__cal-add">Add</button>
+        </article>
+
+        <article class="modal__person" data-name="Mark Evans" data-role="UX Researcher">
+          <img class="modal__person-avatar" src="assets/img/avatar-2.png" alt="">
+          <div class="modal__person-info">
+            <p class="modal__person-name">Mark Evans</p>
+            <p class="modal__person-role">UX Researcher</p>
+          </div>
+          <button type="button" class="modal__cal-add">Add</button>
+        </article>
+
+        <article class="modal__person" data-name="Marina Kim" data-role="Frontend Engineer">
+          <img class="modal__person-avatar" src="assets/img/avatar-3.png" alt="">
+          <div class="modal__person-info">
+            <p class="modal__person-name">Marina Kim</p>
+            <p class="modal__person-role">Frontend Engineer</p>
+          </div>
+          <button type="button" class="modal__cal-add">Add</button>
+        </article>
+
+        <article class="modal__person" data-name="Sophia Reed" data-role="Art Director">
+          <img class="modal__person-avatar" src="assets/img/avatar-4.png" alt="">
+          <div class="modal__person-info">
+            <p class="modal__person-name">Sophia Reed</p>
+            <p class="modal__person-role">Art Director</p>
+          </div>
+          <button type="button" class="modal__cal-add">Add</button>
+        </article>
+      </div>
+    </aside>
+    </div>
+  </div>
+
+  <!-- Mini player: floats over the page (no dark overlay) once the meeting
+       is minimized, so the recording keeps going while you browse the board. -->
+  <div class="mini-player" id="mini-player" hidden>
+    <div class="mini-player__head">
+      <span class="mini-player__label">Listening</span>
+      <button type="button" class="mini-player__recap" id="mini-player-recap">Open recap</button>
+    </div>
+    <div class="mini-player__waveform">
+      <div class="mini-player__blob" id="mini-waveform-orb"></div>
+    </div>
+    <div class="mini-player__foot">
+      <span class="mini-player__timer" id="mini-player-timer">00:00:00</span>
+      <div class="mini-player__controls">
+        <button type="button" class="mini-player__pause" id="mini-player-pause">
+          <img src="assets/img/icon-pause-cream.svg" alt="" id="mini-player-pause-icon">
+        </button>
+        <button type="button" class="mini-player__stop" id="mini-player-stop">
+          <img src="assets/img/icon-stop.svg" alt="">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script type="module" src="assets/js/voice-orb-init.js"></script>
+</body>
+</html>
