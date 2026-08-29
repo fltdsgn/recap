@@ -1,1 +1,837 @@
-m«ëˆ§½©buªàºg§¶)Ý{mšU,j›jÇºà7an{¦Š)ßŠW¨¢ë_ŠW›n·š‘ºÞjG§r‡^v‹­¦ën¦)í¢X§zÊ•éà¶î˜7]yÊy×œ¡×¢ž›­†¥¥Ø¬¦V²¶¬™ë,j¢Šzn¶)éº×â•ç^}«¥µú+²×bžŠ.¶›­¢ëiº×â•ç^}«¥µú+²×hº
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>recap.</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="board">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav class="folder-list scroll-thin scroll-thin--light">
+        <div class="folder-item">
+          <button class="folder-new" type="button" id="folder-new-btn" title="Create new folder">
+            <img class="folder-new__icon" src="assets/img/icon-add.svg" alt="">
+          </button>
+        </div>
+
+        <div class="folder-item">
+          <button class="folder folder--active" data-folder="all">
+            <div class="folder__stack"></div>
+            <div class="folder__papers">
+              <div class="folder__card folder__card--1">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="folder__card folder__card--2">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="folder__card folder__card--3">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="folder__base"></div>
+            <span class="folder__num">12 sessions</span>
+            <span class="folder__name">All meets</span>
+          </button>
+        </div>
+
+        <div class="folder-item">
+          <button class="folder" data-folder="wannabe">
+            <div class="folder__stack"></div>
+            <div class="folder__papers">
+              <div class="folder__card folder__card--1">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="folder__card folder__card--2">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="folder__card folder__card--3">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="folder__base"></div>
+            <span class="folder__num">4 sessions</span>
+            <span class="folder__name">WannaBe</span>
+          </button>
+        </div>
+
+        <div class="folder-item">
+          <button class="folder" data-folder="tefs">
+            <div class="folder__stack"></div>
+            <div class="folder__papers">
+              <div class="folder__card folder__card--1">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="folder__base"></div>
+            <span class="folder__num">1 session</span>
+            <span class="folder__name">Tefs</span>
+          </button>
+        </div>
+
+        <div class="folder-item">
+          <button class="folder" data-folder="cashiron">
+            <div class="folder__stack"></div>
+            <div class="folder__papers"></div>
+            <div class="folder__base"></div>
+            <span class="folder__num">No sessions</span>
+            <span class="folder__name">Cashiron</span>
+          </button>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Center: infinite sticky-note board -->
+    <main class="canvas">
+      <div class="canvas__viewport scroll-thin">
+        <div class="canvas__world">
+
+          <div class="note note--white note--1" data-folder="wannabe" data-title="Feature Adoption Check-in" data-x="2296" data-y="2345" style="transform: rotate(9.28deg);">
+            <div class="note__head">
+              <div class="avatar-stack">
+                <div class="avatar"><img src="assets/img/avatar-1.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-2.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-3.png" alt=""></div>
+                <div class="avatar avatar--counter">+2</div>
+              </div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 22 Â· 13:00 AM</p>
+              <p class="note__title">Feature Adoption Check-in</p>
+              <p class="note__text">Users understand <span>the feature, but don't see</span> why they need it yet</p>
+              <span class="badge">WannaBe</span>
+            </div>
+          </div>
+
+          <div class="note note--tan note--2" data-folder="wannabe" data-title="Landing Page Review" data-x="2399" data-y="2435" style="transform: rotate(-13.19deg);">
+            <div class="note__head">
+              <div class="avatar-stack">
+                <div class="avatar avatar--solo"><img src="assets/img/avatar-1.png" alt=""></div>
+              </div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 18 Â· 3:00 PM</p>
+              <p class="note__title">Landing Page Review</p>
+              <p class="note__text">Keep the hero simpler <span>and move proof points</span> higher</p>
+              <span class="badge">WannaBe</span>
+            </div>
+          </div>
+
+          <div class="note note--tan note--3" data-folder="wannabe" data-title="Design Critique" data-x="2810" data-y="2105" style="transform: rotate(6.12deg);">
+            <div class="note__head">
+              <div class="avatar-stack">
+                <div class="avatar avatar--solo"><img src="assets/img/avatar-1.png" alt=""></div>
+              </div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 18 Â· 3:00 PM</p>
+              <p class="note__title">Design Critique</p>
+              <p class="note__text">Keep the interaction, <span>but simplify the animation states</span></p>
+              <span class="badge">WannaBe</span>
+            </div>
+          </div>
+
+          <div class="note note--tan note--4" data-folder="tefs" data-title="Design Process Review" data-x="2137" data-y="2790" style="transform: rotate(-11.2deg);">
+            <div class="note__head">
+              <div class="avatar-stack">
+                <div class="avatar"><img src="assets/img/avatar-1.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-2.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-3.png" alt=""></div>
+                <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+              </div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 6 Â· 5:00 PM</p>
+              <p class="note__title">Design Process Review</p>
+              <p class="note__text">Show the decision-<span>making earlier, not only the</span> final UI</p>
+              <span class="badge">Tefs</span>
+            </div>
+          </div>
+
+          <div class="note note--tan note--5" data-title="Churn Metrics Review" data-x="2750" data-y="2700" style="transform: rotate(-6deg);">
+            <div class="note__head">
+              <div class="avatar-stack">
+                <div class="avatar avatar--solo"><img src="assets/img/avatar-3.png" alt=""></div>
+              </div>
+            </div>
+            <div class="note__content">
+              <p class="note__meta">Aug 12 Â· 11:00 AM</p>
+              <p class="note__title">Churn Metrics Review</p>
+              <p class="note__text">Track the churn number <span>weekly, not just at the</span> end of the month</p>
+              <span class="badge">All Meets</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <h2 class="canvas__title">All meets</h2>
+
+      <div class="toolbar">
+        <button class="toolbar__tool toolbar__tool--active" data-tool="select" title="Select">
+          <img src="assets/img/icon-pointer.svg" alt="select" class="toolbar__icon">
+        </button>
+        <button class="toolbar__tool" data-tool="pan" title="Hand tool (pan)" hidden>
+          <img src="assets/img/icon-hand.svg" alt="pan" class="toolbar__icon">
+        </button>
+        <img src="assets/img/icon-file.svg" alt="file" class="toolbar__icon toolbar__icon--flip" hidden>
+        <img src="assets/img/icon-smile.svg" alt="smile" class="toolbar__icon" hidden>
+        <span class="toolbar__divider" hidden></span>
+        <img src="assets/img/icon-search.svg" alt="search" class="toolbar__icon" hidden>
+        <img src="assets/img/icon-filter.svg" alt="filter" class="toolbar__icon" hidden>
+      </div>
+    </main>
+
+    <!-- Floating top bar: account, zoom, create session -->
+    <div class="topbar">
+      <div class="topbar__account">
+        <div class="topbar__avatar"><img src="assets/img/avatar-profile.png" alt=""></div>
+        <button type="button" class="topbar__account-menu" title="Account menu">
+          <img src="assets/img/icon-chevron-down.svg" alt="">
+        </button>
+      </div>
+      <span class="topbar__divider"></span>
+      <div class="topbar__zoom-wrap">
+        <button type="button" class="topbar__zoom" title="Zoom">
+          <span>100%</span>
+          <img src="assets/img/icon-chevron-down.svg" alt="">
+        </button>
+      </div>
+      <span class="topbar__divider"></span>
+      <button class="cta" title="">
+        <img src="assets/img/icon-add.svg" alt="">
+        <span>Create new session</span>
+      </button>
+    </div>
+
+    <!-- Right: upcoming events -->
+    <div class="events-col">
+    <aside class="events scroll-thin">
+      <div class="events__pinned">
+      <div class="events__head">
+        <h2 class="events__title">Agenda</h2>
+      </div>
+
+      <div class="events__tabs-wrap">
+        <div class="events__tabs">
+          <button class="events__tab events__tab--active" data-tab="all">All</button>
+          <button class="events__tab" data-tab="today">Today</button>
+          <button class="events__tab" data-tab="tomorrow">Tomorrow</button>
+          <button class="events__tab" data-tab="30aug">30 Aug</button>
+          <button class="events__tab" data-tab="31aug">31 Aug</button>
+          <button class="events__tab" data-tab="1sen">1 Sen</button>
+          <button class="events__tab" data-tab="2sen">2 Sen</button>
+        </div>
+      </div>
+      </div>
+
+      <div class="events__list">
+        <article class="event event--featured" data-tab="today">
+          <div class="event__head">
+            <h3>Product Roadmap Alignment</h3>
+          </div>
+          <div class="event__quote">
+            <div class="event__quote-lines">
+              <span class="event__pill">Keep the interaction, but</span>
+              <img class="event__vector" src="assets/img/icon-vector193.svg" alt="">
+              <span class="event__pill">simplify the animation states</span>
+            </div>
+          </div>
+          <div class="event__footer">
+            <div class="avatar-stack avatar-stack--sm">
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+            </div>
+            <span class="event__time">Today, 10:00 AM</span>
+          </div>
+        </article>
+
+        <article class="event" data-tab="tomorrow">
+          <div class="event__head">
+            <h3>Design Critique</h3>
+          </div>
+          <p class="event__desc">Keep the interaction, but simplify the animation states</p>
+          <div class="event__footer">
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-7.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+            </div>
+            <span class="event__time">Tomorrow, 3:30 PM</span>
+          </div>
+        </article>
+
+        <article class="event" data-tab="30aug">
+          <div class="event__head">
+            <h3>User Research Synthesis</h3>
+          </div>
+          <p class="event__desc">Key insights around trust and onboarding.</p>
+          <div class="event__footer">
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+            </div>
+            <span class="event__time">30 Aug, 2:00 PM</span>
+          </div>
+        </article>
+
+        <article class="event" data-tab="31aug">
+          <div class="event__head">
+            <h3>Call with Design Lead</h3>
+          </div>
+          <p class="event__desc">Discussed component library updates and design tokens.</p>
+          <div class="event__footer">
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+            </div>
+            <span class="event__time">31 Aug, 11:00 AM</span>
+          </div>
+        </article>
+
+        <article class="event" data-tab="1sen">
+          <div class="event__head">
+            <h3>Onboarding Walkthrough</h3>
+          </div>
+          <p class="event__desc">Walk new hire through the design system basics.</p>
+          <div class="event__footer">
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+            </div>
+            <span class="event__time">1 Sep, 9:00 AM</span>
+          </div>
+        </article>
+
+        <article class="event" data-tab="2sen">
+          <div class="event__head">
+            <h3>Sprint Retro</h3>
+          </div>
+          <p class="event__desc">What worked, what didn't, what's next.</p>
+          <div class="event__footer">
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-7.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+            </div>
+            <span class="event__time">2 Sep, 4:00 PM</span>
+          </div>
+        </article>
+      </div>
+    </aside>
+    </div>
+
+  </div>
+
+  <!-- "New folder" modal - the same small generic action-modal template as
+       #confirm-modal, just with its own two fields (title + optional move
+       list) instead of a message + Cancel/Confirm row. -->
+  <div class="modal confirm-modal folder-modal" id="folder-modal" hidden>
+    <div class="modal__overlay" data-folder-modal-close></div>
+
+    <div class="confirm-modal__card">
+      <input class="folder-modal__title-input" type="text" id="folder-title-input" placeholder="Folder title">
+
+      <div class="folder-modal__move" id="folder-move-field">
+        <div class="folder-modal__move-row">
+          <span class="folder-modal__move-label">Move existing sessions here</span>
+          <button type="button" class="folder-modal__move-toggle" id="folder-move-pill">
+            <img src="assets/img/icon-chevron-down-dark.svg" alt="">
+          </button>
+        </div>
+        <div class="modal__move-list" id="folder-move-list" hidden></div>
+      </div>
+
+      <div class="confirm-modal__actions">
+        <button type="button" class="modal__minimize" data-folder-modal-close>Cancel</button>
+        <button type="button" class="folder-modal__create modal__end-session" id="folder-create-btn" disabled>Create folder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm dialog (delete folder, etc.) - site-styled, but a plain
+       card (not the folded-paper modal shell, which is sized for much
+       bigger content and distorts badly at this small a size). -->
+  <div class="modal confirm-modal" id="confirm-modal" hidden>
+    <div class="modal__overlay" data-confirm-cancel></div>
+
+    <div class="confirm-modal__card">
+      <h2 class="confirm-modal__title" id="confirm-modal-title">Are you sure?</h2>
+      <p class="confirm-modal__message" id="confirm-modal-message"></p>
+
+      <div class="confirm-modal__actions">
+        <button type="button" class="modal__minimize" id="confirm-modal-cancel">Cancel</button>
+        <button type="button" class="modal__end-session" id="confirm-modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- "Create new session" modal -->
+  <div class="modal" id="session-modal" hidden>
+    <div class="modal__overlay" data-modal-close></div>
+
+    <div class="modal__body">
+    <div class="modal__wrap">
+      <button class="modal__close" data-modal-close title="Close">
+        <img src="assets/img/icon-close.svg" alt="">
+      </button>
+
+      <div class="modal__card">
+        <span class="modal__step" id="modal-step-label">Step 1 <span class="modal__step-dim">of 3</span></span>
+        <div class="modal__before" id="modal-before">
+          <input class="modal__title-input" type="text" id="modal-title-input" placeholder="Session title, or pick a topic">
+
+          <!-- Kept for the draft-date logic (pickCalendarEvent/draftDateLabel) -
+               no longer shown as a separate pill, Figma folds date entirely
+               into picking an Agenda event instead. -->
+          <div class="modal__date" hidden>
+            <button type="button" class="modal__pill" id="modal-date-pill">Pick date</button>
+            <input type="date" class="modal__date-input" id="modal-date-input">
+          </div>
+
+          <div class="modal__fields">
+            <div class="modal__field-group">
+              <div class="modal__field modal__field--people">
+                <div class="modal__field-row modal__field-row--top">
+                  <textarea class="modal__field-input modal__field-input--people" id="modal-people-input" placeholder="Who's listening?" rows="1"></textarea>
+                  <button type="button" class="modal__pill" id="modal-people-pill" hidden>Select people</button>
+                </div>
+              </div>
+              <p class="modal__field-hint" id="modal-people-hint">Type names, separated by commas</p>
+            </div>
+
+            <label class="modal__field modal__field--message">
+              <textarea class="modal__field-input modal__field-input--textarea" id="modal-message-input" placeholder="What do you want to communicate?"></textarea>
+              <button type="button" class="modal__pill modal__pill--speak">
+                <img src="assets/img/icon-microphone.svg" alt="">
+                Speak
+              </button>
+            </label>
+          </div>
+
+          <button type="button" class="modal__continue" id="modal-continue-btn" disabled>Continue</button>
+        </div>
+
+        <div class="modal__meet" id="modal-meet" hidden>
+          <div class="modal__meet-body">
+            <span class="modal__intention-badge">Your intention</span>
+            <p class="modal__intention-text" id="modal-intention-text"></p>
+
+            <div class="modal__waveform">
+              <div class="modal__waveform-blob" id="modal-waveform-orb"></div>
+            </div>
+
+            <p class="modal__ready-text" id="modal-ready-text">Ready To Listen</p>
+
+            <div class="modal__status-row" id="modal-status-row" hidden>
+              <button type="button" class="modal__waveform-pause" id="modal-waveform-pause">
+                <svg id="modal-waveform-icon-pause" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                  <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/>
+                  <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/>
+                </svg>
+                <svg id="modal-waveform-icon-play" viewBox="0 0 24 24" width="24" height="24" fill="none" hidden>
+                  <path d="M6 4.2C6 3 7.3 2.3 8.4 2.9L19.5 9.7C20.6 10.4 20.6 12 19.5 12.6L8.4 19.5C7.3 20.1 6 19.3 6 18.1V4.2Z" fill="currentColor"/>
+                </svg>
+              </button>
+              <span class="modal__listening-text">Listening Â· <span id="modal-timer">00:00</span></span>
+            </div>
+          </div>
+
+          <div class="modal__meet-actions">
+            <button type="button" class="modal__end-session" id="modal-start-btn">Start Session</button>
+          </div>
+
+          <div class="modal__meet-actions" id="modal-meet-actions" hidden>
+            <button type="button" class="modal__minimize" id="modal-minimize-btn">Minimize</button>
+            <button type="button" class="modal__end-session" id="modal-end-btn">End session and transcript</button>
+          </div>
+        </div>
+
+        <div class="modal__recap" id="modal-recap" hidden>
+          <button type="button" class="modal__recap-delete" id="modal-recap-delete" title="Delete session">
+            <img src="assets/img/icon-trash.svg" alt="">
+          </button>
+
+          <div class="modal__recap-stage">
+            <aside class="modal__recap-about">
+              <div class="modal__recap-heading">
+                <h2 class="modal__title modal__recap-title" id="modal-recap-title">Product Roadmap Alignment</h2>
+
+                <div class="modal__recap-tabs">
+                  <button type="button" class="modal__recap-tab is-active" data-recap-tab="chat">Chat</button>
+                  <button type="button" class="modal__recap-tab" data-recap-tab="transcript">Transcript</button>
+                </div>
+              </div>
+
+              <div class="modal__recap-people-block">
+                <h3 class="modal__recap-about-title">About</h3>
+                <div class="modal__recap-people">
+                  <div class="modal__recap-person">
+                    <p class="modal__recap-person-name">Olivia Chen</p>
+                    <p class="modal__recap-person-role">Design Lead</p>
+                  </div>
+                  <div class="modal__recap-person">
+                    <p class="modal__recap-person-name">Mark Evans</p>
+                    <p class="modal__recap-person-role">UX Researcher</p>
+                  </div>
+                  <div class="modal__recap-person">
+                    <p class="modal__recap-person-name">Marina Kim</p>
+                    <p class="modal__recap-person-role">Frontend Engineer</p>
+                  </div>
+                  <div class="modal__recap-person">
+                    <p class="modal__recap-person-name">18 Aug</p>
+                    <p class="modal__recap-person-role">10:00 AM</p>
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            <div class="modal__recap-column">
+              <div class="modal__recap-panes scroll-thin">
+                <div class="modal__recap-pane" id="recap-pane-chat">
+                  <div class="modal__recap-thread" id="recap-chat-thread">
+                    <p class="modal__recap-summary">
+                      You planned to explain that the new navigation is simpler, reduces cognitive load, and should be tested before adding more features. In the meeting, you focused mostly on
+                      <span class="modal__recap-highlight">clarity and ease of use</span>, mentioned
+                      <span class="modal__recap-highlight">cognitive load</span> only briefly, and presented
+                      <span class="modal__recap-highlight">testing before adding more features</span> as a secondary point rather than the main argument.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="modal__recap-pane" id="recap-pane-transcript" hidden>
+                  <div class="modal__recap-view-toggle" id="transcript-view-toggle">
+                    <button type="button" class="modal__recap-view-btn is-active" data-transcript-view="bubbles">Bubbles</button>
+                    <button type="button" class="modal__recap-view-btn" data-transcript-view="compact">Compact</button>
+                  </div>
+
+                  <div class="modal__recap-transcript" id="transcript-view-bubbles">
+                    <article class="modal__recap-msg modal__recap-msg--other">
+                      <div class="modal__recap-msg-avatar"><img src="assets/img/avatar-1.png" alt=""></div>
+                      <div class="modal__recap-msg-bubble">
+                        <div class="modal__recap-msg-head">
+                          <span class="modal__recap-msg-name">Olivia Chen</span>
+                          <span class="modal__recap-msg-role">Design Lead</span>
+                        </div>
+                        <div class="modal__recap-msg-row">
+                          <p class="modal__recap-msg-text">Can you walk me through why you changed the navigation structure?</p>
+                          <span class="modal__recap-msg-time">10:02</span>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="modal__recap-msg modal__recap-msg--you">
+                      <div class="modal__recap-msg-bubble">
+                        <span class="modal__recap-msg-name">You</span>
+                        <div class="modal__recap-msg-row">
+                          <p class="modal__recap-msg-text">The main goal was to make the hierarchy easier to understand. The previous version forced users to scan too many options at once.</p>
+                          <span class="modal__recap-msg-time">10:03</span>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="modal__recap-msg modal__recap-msg--other">
+                      <div class="modal__recap-msg-avatar"><img src="assets/img/avatar-1.png" alt=""></div>
+                      <div class="modal__recap-msg-bubble">
+                        <div class="modal__recap-msg-head">
+                          <span class="modal__recap-msg-name">Olivia Chen</span>
+                          <span class="modal__recap-msg-role">Design Lead</span>
+                        </div>
+                        <div class="modal__recap-msg-row">
+                          <p class="modal__recap-msg-text">What makes you confident this version actually reduces cognitive load?</p>
+                          <span class="modal__recap-msg-time">10:04</span>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="modal__recap-msg modal__recap-msg--you">
+                      <div class="modal__recap-msg-bubble">
+                        <span class="modal__recap-msg-name">You</span>
+                        <div class="modal__recap-msg-row">
+                          <p class="modal__recap-msg-text">There are fewer competing choices at each step, and related actions are grouped more clearly. It should make the flow easier to scan.</p>
+                          <span class="modal__recap-msg-time">10:05</span>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
+
+                  <!-- Alternate "Compact" view for larger meetings (10+ speakers) - no
+                       bubble/avatar per line, just name+time+text, so the list scales
+                       without turning into a wall of oversized cards. Kept alongside the
+                       bubble view (not replacing it) so both can be compared. -->
+                  <div class="modal__recap-lines" id="transcript-view-compact" hidden>
+                    <div class="modal__recap-line">
+                      <div class="modal__recap-line-head">
+                        <span class="modal__recap-line-name">Olivia Chen</span>
+                        <span class="modal__recap-line-time">10:02</span>
+                      </div>
+                      <p class="modal__recap-line-text">Can you walk me through why you changed the navigation structure?</p>
+                    </div>
+
+                    <div class="modal__recap-line modal__recap-line--you">
+                      <div class="modal__recap-line-head">
+                        <span class="modal__recap-line-name">You</span>
+                        <span class="modal__recap-line-time">10:03</span>
+                      </div>
+                      <p class="modal__recap-line-text">The main goal was to make the hierarchy easier to understand. The previous version forced users to scan too many options at once.</p>
+                    </div>
+
+                    <div class="modal__recap-line">
+                      <div class="modal__recap-line-head">
+                        <span class="modal__recap-line-name">Olivia Chen</span>
+                        <span class="modal__recap-line-time">10:04</span>
+                      </div>
+                      <p class="modal__recap-line-text">What makes you confident this version actually reduces cognitive load?</p>
+                    </div>
+
+                    <div class="modal__recap-line modal__recap-line--you">
+                      <div class="modal__recap-line-head">
+                        <span class="modal__recap-line-name">You</span>
+                        <span class="modal__recap-line-time">10:05</span>
+                      </div>
+                      <p class="modal__recap-line-text">There are fewer competing choices at each step, and related actions are grouped more clearly. It should make the flow easier to scan.</p>
+                    </div>
+
+                    <div class="modal__recap-line">
+                      <div class="modal__recap-line-head">
+                        <span class="modal__recap-line-name">Mark Evans</span>
+                        <span class="modal__recap-line-time">10:06</span>
+                      </div>
+                      <p class="modal__recap-line-text">Did we test this with anyone who hadn't seen the old navigation before?</p>
+                    </div>
+
+                    <div class="modal__recap-line modal__recap-line--you">
+                      <div class="modal__recap-line-head">
+                        <span class="modal__recap-line-name">You</span>
+                        <span class="modal__recap-line-time">10:07</span>
+                      </div>
+                      <p class="modal__recap-line-text">Not yet - that's planned for the next round of usability sessions.</p>
+                    </div>
+
+                    <div class="modal__recap-line">
+                      <div class="modal__recap-line-head">
+                        <span class="modal__recap-line-name">Marina Kim</span>
+                        <span class="modal__recap-line-time">10:08</span>
+                      </div>
+                      <p class="modal__recap-line-text">From an implementation side, this should be a smaller diff than the last redesign.</p>
+                    </div>
+
+                    <div class="modal__recap-line">
+                      <div class="modal__recap-line-head">
+                        <span class="modal__recap-line-name">Sophia Reed</span>
+                        <span class="modal__recap-line-time">10:09</span>
+                      </div>
+                      <p class="modal__recap-line-text">Visually it's a lot calmer too - fewer competing accents pulling focus.</p>
+                    </div>
+
+                    <div class="modal__recap-line modal__recap-line--you">
+                      <div class="modal__recap-line-head">
+                        <span class="modal__recap-line-name">You</span>
+                        <span class="modal__recap-line-time">10:10</span>
+                      </div>
+                      <p class="modal__recap-line-text">Exactly - that was one of the goals going in.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal__recap-input-area">
+                <div class="modal__recap-ask" id="recap-ask-row">
+                  <input type="text" class="modal__recap-ask-input" id="recap-ask-input" placeholder="Ask about this sessionâ€¦">
+                  <button type="button" class="modal__recap-speak">
+                    <img src="assets/img/icon-microphone.svg" alt="">
+                    Speak
+                  </button>
+                </div>
+                <input type="text" class="modal__recap-search" id="recap-search-row" placeholder="Search transcript" hidden>
+
+                <button type="button" class="modal__end-session modal__recap-save" id="modal-recap-save">Save session and close</button>
+              </div>
+            </div>
+
+            <div class="modal__recap-chips-wrap">
+              <div class="modal__recap-chips" id="recap-chips">
+                <button type="button" class="modal__recap-chip">Navigation changes?</button>
+                <button type="button" class="modal__recap-chip">Testing?</button>
+                <button type="button" class="modal__recap-chip">Their reaction?</button>
+                <button type="button" class="modal__recap-chip">Next steps?</button>
+              </div>
+              <button type="button" class="modal__recap-chips-clear" id="recap-chips-clear" title="Clear suggestions">
+                <img src="assets/img/icon-close-dark.svg" alt="">
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__side-slot" id="modal-side-slot">
+      <aside class="modal__calendar is-open scroll-thin" id="modal-calendar">
+      <h2 class="modal__calendar-title">Agenda</h2>
+
+      <div class="events__tabs-wrap">
+        <div class="events__tabs" id="modal-calendar-tabs">
+          <button type="button" class="events__tab events__tab--active" data-cal-tab="all">All</button>
+          <button type="button" class="events__tab" data-cal-tab="today">Today</button>
+          <button type="button" class="events__tab" data-cal-tab="tomorrow">Tomorrow</button>
+          <button type="button" class="events__tab" data-cal-tab="26aug">26 Aug</button>
+          <button type="button" class="events__tab" data-cal-tab="27aug">27 Aug</button>
+        </div>
+      </div>
+
+      <div class="modal__calendar-list">
+        <article class="modal__cal-event modal__cal-event--featured"
+          data-date-tab="today" data-day="24" data-month="Aug"
+          data-title="Product Roadmap Alignment">
+          <div class="modal__cal-head">
+            <h3>Product Roadmap Alignment</h3>
+            <button type="button" class="modal__cal-add">Add</button>
+          </div>
+          <p class="modal__cal-desc">Keep the interaction, but simplify the animation states</p>
+          <div class="modal__cal-footer">
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-7.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+              <div class="avatar avatar--counter">+2</div>
+            </div>
+            <span class="modal__cal-time">Today, 10:00 AM</span>
+          </div>
+        </article>
+
+        <article class="modal__cal-event"
+          data-date-tab="tomorrow" data-day="25" data-month="Aug"
+          data-title="User Research Synthesis">
+          <div class="modal__cal-head">
+            <h3>User Research Synthesis</h3>
+            <button type="button" class="modal__cal-add">Add</button>
+          </div>
+          <p class="modal__cal-desc">Key insights around trust and onboarding.</p>
+          <div class="modal__cal-footer">
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-4.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+            </div>
+            <span class="modal__cal-time">Tomorrow, 3:30 PM</span>
+          </div>
+        </article>
+
+        <article class="modal__cal-event"
+          data-date-tab="26aug" data-day="26" data-month="Aug"
+          data-title="Design Critique">
+          <div class="modal__cal-head">
+            <h3>Design Critique</h3>
+            <button type="button" class="modal__cal-add">Add</button>
+          </div>
+          <p class="modal__cal-desc">Keep the interaction, but simplify the animation states</p>
+          <div class="modal__cal-footer">
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-6.png" alt=""></div>
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+            </div>
+            <span class="modal__cal-time">26 Aug, 11:30 AM</span>
+          </div>
+        </article>
+
+        <article class="modal__cal-event"
+          data-date-tab="27aug" data-day="27" data-month="Aug"
+          data-title="Call with Design Lead">
+          <div class="modal__cal-head">
+            <h3>Call with Design Lead</h3>
+            <button type="button" class="modal__cal-add">Add</button>
+          </div>
+          <p class="modal__cal-desc">Discussed component library updates and design tokens.</p>
+          <div class="modal__cal-footer">
+            <div class="avatar-stack avatar-stack--xs">
+              <div class="avatar"><img src="assets/img/avatar-5.png" alt=""></div>
+            </div>
+            <span class="modal__cal-time">27 Aug, 3:30 PM</span>
+          </div>
+        </article>
+      </div>
+    </aside>
+
+    <aside class="modal__calendar modal__people scroll-thin" id="modal-people-panel" hidden>
+      <h2 class="modal__calendar-title">Select people</h2>
+
+      <div class="events__tabs-wrap">
+        <div class="events__tabs" id="modal-people-tabs">
+          <button type="button" class="events__tab events__tab--active" data-dept-tab="all">All</button>
+          <button type="button" class="events__tab" data-dept-tab="design">Design</button>
+          <button type="button" class="events__tab" data-dept-tab="marketing">Marketing</button>
+          <button type="button" class="events__tab" data-dept-tab="develop">Develop</button>
+        </div>
+      </div>
+
+      <div class="modal__calendar-list">
+        <article class="modal__person" data-dept-tab="design" data-name="Olivia Chen" data-role="Design Lead">
+          <img class="modal__person-avatar" src="assets/img/avatar-1.png" alt="">
+          <div class="modal__person-info">
+            <p class="modal__person-name">Olivia Chen</p>
+            <p class="modal__person-role">Design Lead</p>
+          </div>
+          <button type="button" class="modal__cal-add">Add</button>
+        </article>
+
+        <article class="modal__person" data-dept-tab="design" data-name="Mark Evans" data-role="UX Researcher">
+          <img class="modal__person-avatar" src="assets/img/avatar-2.png" alt="">
+          <div class="modal__person-info">
+            <p class="modal__person-name">Mark Evans</p>
+            <p class="modal__person-role">UX Researcher</p>
+          </div>
+          <button type="button" class="modal__cal-add">Add</button>
+        </article>
+
+        <article class="modal__person" data-dept-tab="develop" data-name="Marina Kim" data-role="Frontend Engineer">
+          <img class="modal__person-avatar" src="assets/img/avatar-3.png" alt="">
+          <div class="modal__person-info">
+            <p class="modal__person-name">Marina Kim</p>
+            <p class="modal__person-role">Frontend Engineer</p>
+          </div>
+          <button type="button" class="modal__cal-add">Add</button>
+        </article>
+
+        <article class="modal__person" data-dept-tab="design" data-name="Sophia Reed" data-role="Art Director">
+          <img class="modal__person-avatar" src="assets/img/avatar-4.png" alt="">
+          <div class="modal__person-info">
+            <p class="modal__person-name">Sophia Reed</p>
+            <p class="modal__person-role">Art Director</p>
+          </div>
+          <button type="button" class="modal__cal-add">Add</button>
+        </article>
+      </div>
+    </aside>
+    </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- Mini player: floats over the page (no dark overlay) once the meeting
+       is minimized, so the recording keeps going while you browse the board. -->
+  <div class="mini-player" id="mini-player" hidden>
+    <div class="mini-player__head">
+      <span class="mini-player__label">Listening</span>
+      <button type="button" class="mini-player__recap" id="mini-player-recap">Open recap</button>
+    </div>
+    <div class="mini-player__waveform">
+      <div class="mini-player__blob" id="mini-waveform-orb"></div>
+    </div>
+    <div class="mini-player__foot">
+      <span class="mini-player__timer" id="mini-player-timer">00:00:00</span>
+      <div class="mini-player__controls">
+        <button type="button" class="mini-player__pause" id="mini-player-pause">
+          <img src="assets/img/icon-pause-cream.svg" alt="" id="mini-player-pause-icon">
+        </button>
+        <button type="button" class="mini-player__stop" id="mini-player-stop">
+          <img src="assets/img/icon-stop.svg" alt="">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script type="module" src="assets/js/voice-orb-init.js"></script>
+</body>
+</html>

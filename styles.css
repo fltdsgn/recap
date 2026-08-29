@@ -1,1 +1,2638 @@
-m«ëˆ§½©buªàºg§¶Ër•ë²Å,j›jÇºà7an{¦Š)ßŠW¨¢ë_ŠW›n·š‘ºÞjG§r‡^v‹­¦ën¦)í¢X§zÊ•éà¶î˜7]yÊy×œ¡×¢ž›­†¥¥Ø¬¦V²¶¬™ë,j¢Šzn¶)éº×â•ç^}«¥µú+²×bžŠ.¶›­¢ëiº×â•ç^}«¥µú+²×hº
+@font-face {
+  font-family: 'Kangmas';
+  src: url('assets/fonts/KangmasDemoRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- macOS-style scrollbars: hidden until hovered, no track ---------- */
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.scroll-thin:hover {
+  scrollbar-color: rgba(55, 55, 55, 0.35) transparent;
+}
+
+.scroll-thin::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.scroll-thin:hover::-webkit-scrollbar-thumb {
+  background: rgba(55, 55, 55, 0.35);
+  background-clip: content-box;
+}
+
+.scroll-thin--light:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+.scroll-thin--light:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  background-clip: content-box;
+}
+
+:root {
+  --navy: #1f396b;
+  --navy-deep: #122446;
+  --navy-shadow: #0c172b;
+  --card-shadow: #122446;
+  --cream: #eadec8;
+  --tan-bg: #efe6db;
+  --tan-card: #e3cfae;
+  --tan-text: #373737;
+  --orange: #d94d27;
+  --orange-shadow: #8e3219;
+  --blue-card: #2a4eb1;
+  --grey-panel: #c3bbaf;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+@media (max-width: 1728px) {
+  html {
+    zoom: 0.8;
+  }
+}
+
+body {
+  background-color: var(--navy);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--cream);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.board {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Sidebar ----------
+   Floats over the full-bleed canvas rather than sharing flex space with
+   it - the canvas is the whole screen now, panels are just overlays. */
+
+.sidebar {
+  position: absolute;
+  z-index: 5;
+  top: 140px;
+  left: 43px;
+  width: 197px;
+  height: calc(100% - 172px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.folder-list {
+  --folder-scale: 0.78;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: calc(28px * var(--folder-scale));
+  padding-bottom: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-left: 4px;
+  margin-left: -4px;
+}
+
+.folder-item {
+  position: relative;
+  width: calc(197px * var(--folder-scale));
+  height: calc(176px * var(--folder-scale));
+}
+
+/* The "create folder" button is a short dashed pill now, not a full
+   folder-card - let its wrapper size to content instead of leaving a
+   folder-height gap under it. */
+.folder-item:has(.folder-new) {
+  height: auto;
+}
+
+.folder-menu-trigger {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 3;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.folder-menu-trigger:hover { background: rgba(0, 0, 0, 0.55); }
+
+.folder-item:hover .folder-menu-trigger,
+.folder-menu-trigger.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.folder-menu-dropdown {
+  position: absolute;
+  top: 30px;
+  right: 6px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  padding: 6px;
+  border-radius: 14px;
+  background: #efe9df;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.folder-menu-dropdown button {
+  padding: 8px 10px;
+  border-radius: 9px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  color: #201c1d;
+  transition: background-color 0.15s ease;
+}
+
+.folder-menu-dropdown button:hover { background: rgba(0, 0, 0, 0.06); }
+.folder-menu-dropdown button[data-action="delete"] { color: var(--orange-shadow); }
+
+.folder-new {
+  width: calc(197px * var(--folder-scale));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  border: 2px dashed #fff;
+  border-radius: 44px;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease;
+  opacity: 0.7;
+}
+
+.folder-new:hover { transform: translateY(-2px); opacity: 1; background: rgba(236, 229, 220, 0.06); }
+.folder-new:active { transform: translateY(0); }
+
+.folder-new__icon {
+  width: 24px;
+  height: 24px;
+}
+
+.folder {
+  position: relative;
+  width: 197px;
+  height: 176px;
+  transform: translateY(0) scale(var(--folder-scale));
+  transform-origin: top left;
+  filter: drop-shadow(0 4px 0 var(--card-shadow));
+  text-align: left;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.folder:hover {
+  transform: translateY(-3px) scale(var(--folder-scale));
+  filter: drop-shadow(0 6px 0 var(--card-shadow));
+}
+
+.folder:active {
+  transform: translateY(-1px) scale(var(--folder-scale));
+  filter: drop-shadow(0 3px 0 var(--card-shadow));
+}
+
+@keyframes folderPop {
+  0% { transform: translateY(0) scale(var(--folder-scale)); }
+  40% { transform: translateY(-6px) scale(calc(var(--folder-scale) * 1.05)); }
+  100% { transform: translateY(0) scale(var(--folder-scale)); }
+}
+
+.folder--just-activated {
+  animation: folderPop 0.4s ease;
+}
+
+@keyframes paperOpen1 {
+  from { opacity: 0; transform: translateY(10px) scale(0.75) rotate(-9.37deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(-9.37deg); }
+}
+@keyframes paperOpen2 {
+  from { opacity: 0; transform: translateY(10px) scale(0.75) rotate(7.11deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(7.11deg); }
+}
+@keyframes paperOpen3 {
+  from { opacity: 0; transform: translateY(10px) scale(0.75) rotate(-4.96deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(-4.96deg); }
+}
+
+.folder--just-activated .folder__card--1 {
+  animation: paperOpen1 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s backwards;
+}
+.folder--just-activated .folder__card--2 {
+  animation: paperOpen2 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s backwards;
+}
+.folder--just-activated .folder__card--3 {
+  animation: paperOpen3 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.19s backwards;
+}
+
+.folder__stack {
+  position: absolute;
+  inset: 0;
+  bottom: auto;
+  height: 163px;
+  background: var(--navy-deep);
+  -webkit-mask-image: url('assets/img/card-union-blue.svg');
+  mask-image: url('assets/img/card-union-blue.svg');
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.folder--active .folder__stack {
+  background: var(--orange);
+  -webkit-mask-image: url('assets/img/card-union-orange.svg');
+  mask-image: url('assets/img/card-union-orange.svg');
+}
+
+.folder__base {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 92px;
+  border-radius: 0 0 13px 13px;
+  background: #2d4c7f;
+}
+
+.folder--active .folder__base {
+  background: #bb401d;
+}
+
+.folder__papers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.folder__card {
+  position: absolute;
+  width: 71px;
+  height: 67px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: 8px;
+  background: #283f6b;
+}
+
+.folder__card span {
+  height: 3px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #556d9b;
+}
+
+.folder__card span:nth-child(2) { width: 46%; }
+.folder__card span:nth-child(4) { width: 76%; }
+.folder__card span:nth-child(5) { width: 62%; }
+
+.folder__card--1 { left: 21px; top: 35px; transform: rotate(-9.37deg); }
+.folder__card--2 {
+  left: 53px;
+  top: 53px;
+  transform: rotate(7.11deg);
+  box-shadow: 0 -1px 2px var(--navy-deep);
+}
+.folder__card--3 {
+  left: 91px;
+  top: 42px;
+  width: 87px;
+  transform: rotate(-4.96deg);
+  box-shadow: 0 -1px 2px var(--navy-deep);
+}
+
+.folder--active .folder__card {
+  background: #ffd2c6;
+}
+
+.folder--active .folder__card span {
+  background: #ffac94;
+}
+
+.folder--active .folder__card--2,
+.folder--active .folder__card--3 {
+  box-shadow: 0 -1px 2px rgba(179, 64, 32, 0.16);
+}
+
+.folder__num {
+  position: absolute;
+  left: 13px;
+  top: 124px;
+  font-size: 16px;
+  font-weight: 700;
+  opacity: 0.28;
+}
+
+.folder__name {
+  position: absolute;
+  left: 13px;
+  top: 99px;
+  font-family: 'Kangmas', serif;
+  font-size: 22px;
+}
+
+/* ---------- Canvas (center) ---------- */
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  color: var(--tan-text);
+}
+
+.canvas__viewport {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: auto;
+  cursor: default;
+}
+
+.canvas__viewport.is-hand-tool {
+  cursor: grab;
+}
+
+.canvas__viewport.is-panning {
+  cursor: grabbing;
+}
+
+.canvas__world {
+  position: relative;
+  width: 5000px;
+  height: 5000px;
+  background-color: var(--navy);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Spans above everything - sidebar included - instead of sitting beside
+   it at the same height. The sidebar is pushed down to clear room. */
+.canvas__title {
+  position: absolute;
+  left: 43px;
+  top: 32px;
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 56px;
+  color: var(--cream);
+  z-index: 6;
+  pointer-events: none;
+}
+
+.note {
+  position: absolute;
+  z-index: 1;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+  padding: 28px;
+  border-radius: 32px;
+  border: 3px solid var(--navy);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.48);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition: box-shadow 0.15s ease, filter 0.15s ease, transform 0.25s ease;
+}
+
+.note__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.note:hover {
+  /* The board still randomizes each note's resting angle inline (untouched
+     here) - hovering just settles it about halfway back toward level and
+     lifts it, rather than snapping fully straight (too jarring on the
+     more tilted notes). The !important is required to win over that
+     inline rotate(). Each note--N gets its own halved angle below, since
+     there's no single value that works for every note's base tilt.
+     No z-index bump here on purpose - notes overlap each other on the
+     board, and jumping a hovered note above its neighbors flip-flopped
+     the stacking order as the cursor moved between them. Leaving stacking
+     at its resting order (see .note's base z-index) means a lifted card
+     can occasionally tuck partly under a neighbor, which reads better
+     than that flicker. */
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22);
+  filter: brightness(1.03);
+}
+
+.note--1:hover { transform: rotate(4.6deg) translateY(-8px) !important; }
+.note--2:hover { transform: rotate(-6.6deg) translateY(-8px) !important; }
+.note--3:hover { transform: rotate(3.1deg) translateY(-8px) !important; }
+.note--4:hover { transform: rotate(-5.6deg) translateY(-8px) !important; }
+.note--5:hover { transform: rotate(-3deg) translateY(-8px) !important; }
+
+.note.is-dragging {
+  cursor: grabbing;
+  z-index: 10;
+  transition: none;
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.28);
+}
+
+.note__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.note--tan { background: var(--tan-card); }
+/* The most recent past session stands out from the rest of the archive -
+   in stacking order too, not just color, regardless of where it happens
+   to sit in the markup (or drag order - .is-dragging's z-index still
+   wins over this while actively dragging). */
+.note--white { background: #fff; z-index: 2; }
+
+.note__meta {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.4;
+  letter-spacing: -0.14px;
+}
+
+.note__title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.15px;
+  /* Safety net for a title longer than these short demo ones, or a system
+     font wider than Inter substituted in - clamp instead of letting an
+     unlucky wrap cut a word off with nothing to show for it. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.note__text {
+  font-family: 'Kangmas', serif;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: 0.28px;
+}
+
+.note--tan .note__text span,
+.note--white .note__text span { color: rgba(55, 55, 55, 0.4); }
+
+.badge {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border: 1.5px solid rgba(55, 55, 55, 0.4);
+  border-radius: 99px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.badge--dark {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.avatar-stack {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  border: 2.5px solid #373737;
+  overflow: hidden;
+  margin-right: -16px;
+}
+
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.avatar--solo { margin-right: 0; }
+
+.note--white .avatar { border-color: #fff; }
+
+.avatar--counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #faf1e2;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 10px;
+  margin-right: 0;
+}
+
+.toolbar {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  align-items: center;
+  gap: 20px;
+  padding: 12px 20px;
+  background: #efe9df;
+  border: 2px solid var(--navy-deep);
+  border-radius: 51px;
+  box-shadow: 0 4px 0 var(--navy-deep);
+  z-index: 2;
+}
+
+.toolbar__icon { width: 24px; height: 24px; }
+.toolbar__icon--flip { transform: scaleY(-1); }
+
+.toolbar__tool {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background-color 0.15s ease;
+}
+
+.toolbar__tool:hover {
+  background: rgba(18, 36, 70, 0.08);
+}
+
+.toolbar__tool--active {
+  background: rgba(18, 36, 70, 0.12);
+}
+
+.toolbar__divider {
+  width: 2px;
+  height: 25px;
+  background: rgba(18, 36, 70, 0.1);
+}
+
+/* ---------- Right: events panel ---------- */
+
+.events-col {
+  position: absolute;
+  z-index: 5;
+  top: 32px;
+  right: 43px;
+  width: 411px;
+  height: calc(100% - 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Floating top bar: account + zoom (visual only for now) + create session,
+   positioned above the Agenda panel so it stays put while the panel
+   collapses/expands underneath it. */
+.topbar {
+  position: absolute;
+  top: 27px;
+  /* Floats over the canvas, just left of the Agenda panel's gap - not
+     above the panel itself (events-col width + its margin + board padding). */
+  right: 504px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 12px 12px 20px;
+  background: #fff;
+  border-radius: 44px;
+  box-shadow: 0 4px 0 var(--navy-deep), 0 6px 0 var(--navy-shadow);
+}
+
+.topbar__account {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar__account-dropdown {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  min-width: 170px;
+  padding: 6px;
+  border-radius: 14px;
+  background: #efe9df;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.topbar__account-dropdown button {
+  padding: 8px 10px;
+  border-radius: 9px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 700;
+  color: #201c1d;
+  transition: background-color 0.15s ease;
+}
+
+.topbar__account-dropdown button:hover { background: rgba(0, 0, 0, 0.06); }
+
+.topbar__account-dropdown__divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.topbar__account-dropdown button[data-action="logout"] { color: var(--orange-shadow); }
+
+.topbar__avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 2px solid var(--navy-shadow);
+  overflow: hidden;
+}
+.topbar__avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.topbar__account-menu {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* The chevron SVG asset is a hardcoded white stroke (made for the old
+   navy account pill) - invert it to read on this light bg instead. */
+.topbar__account-menu img,
+.topbar__zoom img {
+  width: 16px;
+  height: 16px;
+  filter: invert(1);
+  transition: transform 0.15s ease;
+}
+
+.topbar__account-menu.is-open img,
+.topbar__zoom.is-open img {
+  transform: rotate(180deg);
+}
+
+.topbar__divider {
+  width: 2px;
+  height: 23px;
+  align-self: center;
+  background: rgba(55, 55, 55, 0.14);
+  flex-shrink: 0;
+}
+
+.topbar__zoom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  font-weight: 500;
+  color: var(--tan-text);
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+.topbar__zoom:hover { background: rgba(55, 55, 55, 0.06); }
+
+.topbar__zoom-wrap { position: relative; }
+
+.topbar__zoom-dropdown {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  padding: 6px;
+  border-radius: 14px;
+  background: #efe9df;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.topbar__zoom-dropdown button {
+  padding: 8px 10px;
+  border-radius: 9px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 700;
+  color: #201c1d;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.topbar__zoom-dropdown button:hover { background: rgba(0, 0, 0, 0.06); }
+
+.topbar__zoom-dropdown button.is-active {
+  background: var(--orange);
+  color: #fff;
+}
+
+.topbar__zoom-dropdown button.is-active:hover { background: var(--orange); }
+
+.events {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 28px;
+  background: var(--grey-panel);
+  border-radius: 44px;
+  box-shadow: 0 8px 0 var(--navy-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  color: var(--tan-text);
+  overflow-y: auto;
+}
+
+/* Stays put while .events__list scrolls beneath it - the panel's own
+   background color is repeated here so scrolled-under cards don't show
+   through the head/tabs area. */
+.events__pinned {
+  position: relative;
+  position: sticky;
+  top: -28px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 28px;
+  padding-bottom: 16px;
+  margin-top: -28px;
+  background: var(--grey-panel);
+}
+
+/* Soften the hard cut where the sticky head/tabs sit above the scrolling
+   list - a fade instead of an abrupt edge. */
+.events__pinned::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -28px;
+  height: 28px;
+  background: linear-gradient(to bottom, var(--grey-panel), rgba(195, 187, 175, 0));
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+/* Only show the fade once there's actually scrolled content sneaking
+   under the sticky head - not sitting on the very first (unscrolled) card. */
+.events.is-scrolled .events__pinned::after {
+  opacity: 1;
+}
+
+.events__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.events__title {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 36px;
+}
+
+.events__tabs-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.events__tabs-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, rgba(186, 179, 177, 0), var(--grey-panel));
+  pointer-events: none;
+}
+
+.events__tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+
+.events__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.events__tabs .events__tab {
+  flex-shrink: 0;
+}
+
+.events__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border: 2px dashed #a69c8e;
+  border-radius: 128px;
+  color: var(--tan-text);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.28px;
+  transition: border-color 0.15s ease;
+}
+.events__tab--active { border-color: var(--orange); }
+.events__tab:hover { border-color: #8f8474; }
+
+.events__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.event {
+  position: relative;
+  width: 100%;
+  border-radius: 28px;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+/* "â€¦" menu on hover - move a session into a folder. Same look as the
+   folder options menu, just attached to an event card instead. */
+.event-menu-trigger {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+.event-menu-trigger img { width: 16px; height: 16px; }
+.event-menu-trigger:hover { background: #f7ead3; }
+
+.event:hover .event-menu-trigger,
+.note:hover .event-menu-trigger,
+.modal__cal-event:hover .event-menu-trigger,
+.event-menu-trigger.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.event-menu-dropdown {
+  position: absolute;
+  top: 34px;
+  right: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 14px;
+  background: #efe9df;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.event-menu-dropdown__label {
+  padding: 6px 10px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(32, 28, 29, 0.4);
+}
+
+.event-menu-dropdown button {
+  padding: 8px 10px;
+  border-radius: 9px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  color: #201c1d;
+  transition: background-color 0.15s ease;
+}
+
+.event-menu-dropdown button:hover { background: rgba(0, 0, 0, 0.06); }
+.event-menu-dropdown button.is-current { color: var(--orange-shadow); }
+
+.event--featured {
+  background: #fff;
+  color: var(--tan-text);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.13);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.event--featured:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.13);
+}
+
+.event:not(.event--featured) {
+  background: #f2ebdd;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.13);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.event:not(.event--featured):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
+  filter: brightness(1.02);
+}
+
+.event--draft {
+  background: #efe6db;
+  border: 2px dashed var(--orange);
+}
+
+.event__draft-badge {
+  flex-shrink: 0;
+  background: var(--orange);
+  color: var(--cream);
+  padding: 3px 8px;
+  border-radius: 40px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.tag--draft {
+  background: rgba(217, 77, 39, 0.16);
+  color: var(--orange-shadow);
+}
+
+.event__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.event__head h3 {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+.event__desc {
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(55, 55, 55, 0.47);
+  width: 100%;
+}
+
+.event__quote {
+  position: relative;
+  height: 64px;
+}
+
+.event__quote-lines {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.event__vector {
+  position: absolute;
+  left: -4px;
+  top: 10px;
+  width: 14px;
+  height: 8px;
+  z-index: 1;
+}
+
+.event__pill {
+  display: inline-block;
+  background: #d9d9d9;
+  color: #201c1d;
+  padding: 4px 8px;
+  border-radius: 40px;
+  font-size: 16px;
+  line-height: 1.3;
+  width: fit-content;
+}
+
+.event__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.event__time {
+  padding: 13px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 44px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.avatar-stack--sm .avatar {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(211, 209, 205, 0.4);
+  margin-right: -8px;
+}
+.avatar-stack--sm .avatar:last-child { margin-right: 0; }
+
+.avatar-stack--xs .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 99px;
+  border: 1.5px solid #efe7db;
+  margin-right: -8px;
+}
+.avatar-stack--xs .avatar:last-child { margin-right: 0; }
+
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px 12px 16px;
+  background: var(--orange);
+  border: 2px solid var(--orange-shadow);
+  border-radius: 128px;
+  box-shadow: 0 4px 0 var(--orange-shadow);
+  color: var(--cream);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.32px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.cta:disabled {
+  background: var(--grey-panel);
+  border-color: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+  color: rgba(55, 55, 55, 0.6);
+  cursor: not-allowed;
+}
+.cta:disabled img { filter: opacity(0.5); }
+
+.cta:hover {
+  background: #e35a35;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--orange-shadow);
+}
+
+.cta:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 var(--orange-shadow);
+}
+
+.cta img { width: 24px; height: 24px; }
+
+/* ---------- "Create new session" modal ---------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.modal[hidden] { display: none; }
+.modal__calendar[hidden] { display: none; }
+.modal__before[hidden] { display: none; }
+.modal__meet[hidden] { display: none; }
+.modal__recap[hidden] { display: none; }
+[hidden] { display: none !important; }
+
+.modal.is-open { opacity: 1; }
+
+.modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(32, 28, 29, 0.7);
+}
+
+/* Positioned relative to the wrap itself (not the viewport) so it always
+   sits a fixed, sane gap to its left regardless of where the wrap's own
+   left edge lands (its width is fixed but its left edge floats). */
+.modal__close {
+  position: absolute;
+  z-index: 2;
+  left: -96px;
+  top: 32px;
+  width: 64px;
+  height: 64px;
+  border: 2px dashed #dfcfb2;
+  border-radius: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.modal__close:hover { background: rgba(255, 255, 255, 0.08); }
+.modal__close img { width: 28px; height: 28px; }
+
+.modal__body {
+  position: relative;
+}
+
+/* Just a padded container behind the form + Agenda - no mask, no notch.
+   Pinned to the viewport's top/right/bottom (not centered) - only the
+   left edge floats, wherever the fixed 1400px width happens to land. */
+.modal__wrap {
+  position: fixed;
+  z-index: 1;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  width: 1400px;
+  max-width: calc(100vw - 24px);
+  padding: 32px;
+  background: #dfcfb2;
+  border-radius: 56px;
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  transform-origin: bottom center;
+  transform: translateY(140px) scale(0.9) rotate(-1.5deg);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal.is-open .modal__wrap {
+  transform: translateY(0) scale(1) rotate(0deg);
+}
+
+/* Decorative "Prepare" corner tab parked for now - dropping it rather than
+   fighting the rotated-asset positioning further; a plain top loading bar
+   is planned to replace it later. Keeping just the step label, plain. */
+.modal__step {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #9a9186;
+}
+
+/* The Compare screen has its own title+tabs standing in for the step
+   context - the separate corner label would just add a redundant row
+   (and its flex gap) above it, pushing everything else down. */
+.modal__card.is-recap .modal__step {
+  display: none;
+}
+
+.modal__step-dim {
+  opacity: 0.5;
+}
+
+.modal__card {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--cream);
+  border-radius: 40px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: var(--tan-text);
+}
+
+.modal__before {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+  height: 100%;
+}
+
+.modal__title-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1.18;
+  color: #201c1d;
+  transition: opacity 0.15s ease;
+}
+
+.modal__title-input::placeholder {
+  color: #201c1d;
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+
+.modal__title-input:hover::placeholder {
+  opacity: 0.7;
+}
+
+/* Once there's real text (not just the placeholder), hover dims it from
+   full opacity down to 0.7 instead - a separate rule so the two don't
+   stack multiplicatively when the field is empty. */
+.modal__title-input:not(:placeholder-shown):hover {
+  opacity: 0.7;
+}
+
+.modal__fields {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.modal__field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: transparent;
+  border: 2px solid var(--grey-panel);
+  border-radius: 28px;
+  padding: 24px 28px;
+  cursor: text;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.modal__field:hover {
+  border-color: #b3a48c;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.modal__field--people {
+  border-radius: 72px;
+  padding: 20px 32px;
+}
+
+.modal__field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.modal__field-hint {
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #747474;
+  text-align: left;
+}
+
+.modal__field--message {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 32px;
+}
+
+.modal__pill--speak {
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal__pill--speak img { width: 24px; height: 24px; }
+
+.modal__person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: var(--tan-bg);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.13);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal__person:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
+}
+
+.modal__person-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.modal__person-info { flex: 1; min-width: 0; }
+
+.modal__person-name {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--tan-text);
+}
+
+.modal__person-role {
+  font-size: 12px;
+  color: rgba(55, 55, 55, 0.6);
+  margin-top: 2px;
+}
+
+.modal__person.is-added .modal__cal-add {
+  border-style: solid;
+  background: rgba(32, 28, 29, 0.08);
+}
+
+.modal__field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.modal__field-row--top { align-items: flex-start; }
+
+.modal__field-label {
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.24px;
+  color: #201c1d;
+  opacity: 0.4;
+  flex: 1;
+}
+
+.modal__field-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 24px;
+  color: #201c1d;
+}
+
+.modal__field-input::placeholder {
+  color: rgba(32, 28, 29, 0.4);
+  opacity: 1;
+}
+
+.modal__field-input--people {
+  resize: none;
+  overflow: hidden;
+  line-height: 1.3;
+  padding-top: 4px;
+}
+
+.modal__field-input--textarea {
+  flex: 1;
+  min-height: 120px;
+  resize: none;
+}
+
+/* ---------- Confirm dialog (delete folder, etc.) - the small generic
+   "action modal" template: plain centered card, not the folded-paper
+   modal shell (that shape is sized for much bigger content and distorts
+   badly this small). ---------- */
+
+/* Confirm dialogs open ON TOP of an already-open session/folder modal
+   (e.g. deleting from within Compare) - both share .modal's z-index:100,
+   so without this it stacks by DOM order and ends up behind whichever
+   modal was opened later. Always wins regardless of open order. */
+.confirm-modal {
+  z-index: 200;
+}
+
+.confirm-modal__card {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  width: 637px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 44px;
+  border-radius: 44px;
+  background: var(--cream);
+  color: var(--tan-text);
+  transform: translate(-50%, -50%) translateY(24px) scale(0.94);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.confirm-modal.is-open .confirm-modal__card {
+  transform: translate(-50%, -50%) translateY(0) scale(1);
+}
+
+.confirm-modal__title {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1;
+  color: #373737;
+  transform: rotate(0.3deg);
+}
+
+.confirm-modal__message {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+  color: #201c1d;
+}
+
+.confirm-modal__actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+/* ---------- "New folder" modal - shares .confirm-modal's card/close/open-
+   transition rules, just with its own fields instead of message+actions.
+   ---------- */
+
+.folder-modal__title-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1;
+  color: #373737;
+  transform: rotate(0.3deg);
+}
+
+.folder-modal__title-input::placeholder { color: #373737; opacity: 0.4; }
+
+.folder-modal__move {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  width: 100%;
+}
+
+.folder-modal__move.is-disabled { opacity: 0.4; }
+
+.folder-modal__move-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  cursor: pointer;
+  padding: 12px 12px 12px 32px;
+  border: 2px solid #c3bbaf;
+  border-radius: 44px;
+}
+
+.folder-modal__move-label {
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.2px;
+  color: #201c1d;
+  opacity: 0.4;
+}
+
+.folder-modal__move-toggle {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.folder-modal__move-toggle:hover { background: rgba(32, 28, 29, 0.06); }
+.folder-modal__move-toggle img { width: 16px; height: 16px; transition: transform 0.15s ease; }
+.folder-modal__move-toggle.is-open img { transform: rotate(180deg); }
+.folder-modal__move.is-disabled .folder-modal__move-toggle { cursor: not-allowed; }
+
+.modal__move-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.modal__move-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 15px;
+  color: #201c1d;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.modal__move-row:hover { background: rgba(32, 28, 29, 0.06); }
+.modal__move-row.is-selected { background: var(--orange); color: #fff; }
+
+.modal__create-folder {
+  width: 100%;
+  border: 2px solid var(--orange-shadow);
+  border-radius: 128px;
+  padding: 20px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.32px;
+  color: var(--cream);
+  background: var(--orange);
+  box-shadow: 0 4px 0 var(--orange-shadow);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.modal__create-folder:hover:not(:disabled) {
+  background: #e35a35;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--orange-shadow);
+}
+
+.modal__create-folder:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 var(--orange-shadow);
+}
+
+.modal__end-session:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: 0 4px 0 var(--orange-shadow);
+}
+
+.modal__end-session:disabled:hover {
+  background: var(--orange);
+  transform: none;
+  box-shadow: 0 4px 0 var(--orange-shadow);
+}
+
+.modal__pill {
+  flex-shrink: 0;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 12px 20px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.28px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__pill:hover { background: rgba(32, 28, 29, 0.06); }
+
+.modal__pill.has-value {
+  border-style: solid;
+  background: rgba(32, 28, 29, 0.08);
+}
+
+.modal__pill:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.modal__pill:disabled:hover { background: transparent; }
+
+.modal__date {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.modal__date-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+.modal__continue {
+  width: 100%;
+  padding: 20px 44px;
+  border: none;
+  border-radius: 128px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.32px;
+  background: rgba(18, 36, 70, 0.17);
+  color: rgba(32, 28, 29, 0.35);
+  cursor: not-allowed;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal__continue.is-ready {
+  border: 2px solid var(--orange-shadow);
+  background: var(--orange);
+  color: var(--cream);
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--orange-shadow);
+}
+
+.modal__continue.is-ready:hover {
+  background: #e35a35;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--orange-shadow);
+}
+
+/* ---------- "Pick date" side panel: same agenda as the main board ---------- */
+
+/* Agenda and "Select people" share one fixed-width slot, each absolutely
+   positioned on top of the other - so the card next to it (flex:1) never
+   has to recompute its width while one panel is animating out and the
+   other in. Without this, the brief moment both were in-flow together
+   squeezed the card and then sprang it back, a visible width jump. */
+.modal__side-slot {
+  position: relative;
+  flex-shrink: 0;
+  width: 411px;
+  height: 100%;
+}
+
+.modal__calendar {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow-y: auto;
+  padding: 32px;
+  background: var(--grey-panel);
+  border-radius: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: var(--tan-text);
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal__calendar.is-open {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.modal__calendar-title {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 36px;
+}
+
+.modal__calendar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal__cal-event {
+  position: relative;
+  border-radius: 28px;
+  padding: 20px;
+  background: #f2ebdd;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.13);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal__cal-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
+}
+
+.modal__cal-event--selected {
+  background: #fff;
+}
+
+.modal__cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal__cal-head h3 {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+.modal__cal-add {
+  flex-shrink: 0;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.28px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__cal-add:hover { background: rgba(32, 28, 29, 0.08); }
+
+.modal__cal-desc {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #7f7f7f;
+}
+
+.modal__cal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.modal__cal-time {
+  padding: 13px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 44px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ---------- "Meeting" screen: recording in progress ---------- */
+
+.modal__meet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.modal__meet-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.modal__intention-badge {
+  background: #201c1d;
+  color: #dfcfb2;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.modal__intention-text {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1.1;
+  color: #201c1d;
+  max-width: 672px;
+}
+
+.modal__waveform {
+  position: relative;
+  width: min(100%, 620px);
+  height: clamp(190px, 27vh, 250px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal__waveform-blob {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.modal__waveform-blob.is-paused { animation-play-state: paused; }
+
+.modal__status-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.modal__waveform-pause {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 128px;
+  background: #201c1d;
+  color: #dfcfb2;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.modal__waveform-pause:hover { transform: scale(1.06); }
+
+.modal__ready-text,
+.modal__listening-text {
+  font-weight: 500;
+  font-size: 20px;
+  color: #201c1d;
+}
+
+.modal__meet-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  justify-content: center;
+}
+
+/* Overrides the shared .modal__end-session's flex:1 - here it sits next to
+   Minimize as its own fixed-ish width, not stretched to fill the row. */
+.modal__meet-actions .modal__end-session {
+  flex: 0 1 auto;
+  width: 40%;
+  min-width: 320px;
+}
+
+.modal__minimize {
+  flex-shrink: 0;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 20px 32px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__minimize:hover { background: rgba(32, 28, 29, 0.06); }
+
+.modal__end-session {
+  flex: 1;
+  border: 2px solid var(--orange-shadow);
+  border-radius: 128px;
+  padding: 20px 44px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--cream);
+  background: var(--orange);
+  box-shadow: 0 4px 0 var(--orange-shadow);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modal__end-session:hover {
+  background: #e35a35;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--orange-shadow);
+}
+
+.modal__end-session:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 var(--orange-shadow);
+}
+
+/* ---------- "Compare" screen: recap chat / transcript, shown after End session ---------- */
+
+.modal__recap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* While the recap step is showing, the CARD itself stops scrolling - only
+   the cream body inside it does, so the title/tabs stay put and the
+   scrollbar lives inside the cream box instead of on the card's edge. */
+.modal__card.is-recap {
+  overflow: hidden;
+}
+
+.modal__card.is-recap .modal__recap {
+  flex: 1;
+  min-height: 0;
+}
+
+.modal__recap-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal__recap-title {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1.18;
+  color: #373737;
+  margin: 0;
+  /* Wraps within the left column's width instead of running the full
+     header width in one line, matching the Figma title block. */
+  max-width: 100%;
+  /* An archived note's full text can end up here as the "title" - clamp
+     instead of letting it wrap forever and push everything else (tabs,
+     About) way down the column. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.modal__recap-delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 48px;
+  height: 48px;
+  border: 2px dashed #373737;
+  border-radius: 128px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__recap-delete:hover { background: rgba(55, 55, 55, 0.08); }
+.modal__recap-delete img { width: 20px; height: 20px; }
+
+/* Main body: a narrow "About" sidebar (bottom-pinned participant list),
+   the chat/transcript column, and a floating quick-question corner. A
+   3-column grid with equal side tracks keeps the chat column genuinely
+   centered instead of just landing wherever flex leaves it. */
+.modal__recap-stage {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(0, 700px) minmax(160px, 1fr);
+  gap: 32px;
+  flex: 1;
+  min-height: 0;
+}
+
+.modal__recap-column {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Starts right under the tabs and grows downward - scrolls once the
+   conversation actually gets long enough to overflow. */
+.modal__recap-panes {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.modal__recap-input-area {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 24px;
+}
+
+/* Fades the last bit of scrolled content into the input row instead of
+   cutting it off sharply - same idea as the Figma gradient+blur backdrop. */
+.modal__recap-input-area::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 24px;
+  background: linear-gradient(to bottom, rgba(234, 222, 200, 0), var(--cream));
+  pointer-events: none;
+}
+
+/* Title+tabs live at the top of this column and the participant list at
+   the bottom - same left column, matching Figma - so Chat/Transcript's
+   content (in the middle column) starts level with the title instead of
+   below a separate full-width header. */
+.modal__recap-about {
+  flex-shrink: 0;
+  width: 240px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.modal__recap-people-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal__recap-about-title {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 24px;
+  color: #373737;
+}
+
+.modal__recap-people {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal__recap-person-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #201c1d;
+}
+
+.modal__recap-person-role {
+  font-size: 14px;
+  color: #7f7f7f;
+}
+
+.modal__recap-save {
+  width: 100%;
+}
+
+.modal__recap-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.modal__recap-tab {
+  border: 2px dashed rgba(55, 55, 55, 0.14);
+  border-radius: 128px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  color: #373737;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.modal__recap-tab.is-active { border-color: var(--orange); }
+.modal__recap-tab:hover { border-color: rgba(55, 55, 55, 0.35); }
+.modal__recap-tab.is-active:hover { border-color: var(--orange); }
+
+.modal__recap-pane[hidden] { display: none; }
+
+.modal__recap-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal__recap-summary {
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.4;
+  color: rgba(32, 28, 29, 0.4);
+}
+
+.modal__recap-highlight {
+  color: #201c1d;
+  /* Two layers: a flat fill, plus a repeating dash pattern pinned to the
+     bottom edge (instead of border-bottom: dashed) so the dashes can be
+     animated by sliding their background-position. */
+  background-image:
+    linear-gradient(rgba(32, 28, 29, 0.08), rgba(32, 28, 29, 0.08)),
+    repeating-linear-gradient(to right, var(--orange) 0 5px, transparent 5px 10px);
+  background-size: 100% 100%, 10px 2px;
+  background-position: 0 0, 0 100%;
+  background-repeat: no-repeat, repeat-x;
+  border-radius: 4px;
+  padding: 0 2px 2px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__recap-highlight:hover {
+  background-image:
+    linear-gradient(rgba(217, 77, 39, 0.18), rgba(217, 77, 39, 0.18)),
+    repeating-linear-gradient(to right, var(--orange) 0 5px, transparent 5px 10px);
+  animation: recap-highlight-march 0.6s linear infinite;
+}
+
+@keyframes recap-highlight-march {
+  to { background-position: 0 0, 10px 100%; }
+}
+
+/* A narrow column of its own next to the chat, bottom-aligned - reserves
+   real space (rather than floating over the chat column) so it can't
+   overlap the input row, while still reading as its own corner cluster
+   like the Figma quick-question stack. */
+.modal__recap-chips-wrap {
+  flex-shrink: 0;
+  width: 190px;
+  height: 100%;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.modal__recap-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.modal__recap-chip {
+  border: 2px dashed rgba(55, 55, 55, 0.3);
+  border-radius: 128px;
+  padding: 16px 24px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: #373737;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.modal__recap-chip:hover { border-color: rgba(55, 55, 55, 0.6); }
+
+.modal__recap-chips-clear {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border: 2px dashed rgba(55, 55, 55, 0.2);
+  border-radius: 128px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__recap-chips-clear:hover { background: rgba(55, 55, 55, 0.08); }
+.modal__recap-chips-clear img { width: 24px; height: 24px; }
+
+/* Bubbles vs Compact - a straight avatar-card thread reads fine for a
+   handful of speakers, but stops scaling once a call has 10 people on
+   it. Compact keeps both options in the DOM so they're easy to compare;
+   only one renders at a time. */
+.modal__recap-view-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.modal__recap-view-btn {
+  border: 2px dashed rgba(55, 55, 55, 0.14);
+  border-radius: 128px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 12px;
+  color: #373737;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.modal__recap-view-btn.is-active { border-color: var(--orange); }
+.modal__recap-view-btn:hover { border-color: rgba(55, 55, 55, 0.35); }
+.modal__recap-view-btn.is-active:hover { border-color: var(--orange); }
+
+.modal__recap-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal__recap-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal__recap-line {
+  padding-left: 12px;
+  border-left: 2px solid rgba(55, 55, 55, 0.14);
+}
+
+.modal__recap-line--you {
+  border-left-color: var(--orange);
+}
+
+.modal__recap-line-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.modal__recap-line-name {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #373737;
+}
+
+.modal__recap-line--you .modal__recap-line-name { color: var(--orange); }
+
+.modal__recap-line-time {
+  font-size: 12px;
+  color: #827a6d;
+}
+
+.modal__recap-line-text {
+  font-size: 15px;
+  line-height: 1.4;
+  color: #201c1d;
+}
+
+.modal__recap-msg {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  max-width: min(560px, 90%);
+}
+
+.modal__recap-msg--you {
+  align-self: flex-end;
+  max-width: min(340px, 90%);
+}
+
+.modal__recap-msg-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--orange);
+  overflow: hidden;
+}
+
+.modal__recap-msg-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal__recap-msg-bubble {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 24px;
+  border: 2px dashed var(--cream);
+  background: #fff;
+}
+
+.modal__recap-msg--you .modal__recap-msg-bubble { background: #b5aa9a; }
+
+.modal__recap-msg-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal__recap-msg-name {
+  font-family: 'Kangmas', serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: #373737;
+}
+
+.modal__recap-msg-role {
+  font-size: 13px;
+  color: #827a6d;
+}
+
+.modal__recap-msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.modal__recap-msg-text {
+  flex: 1;
+  min-width: 0;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: -0.15px;
+  color: #201c1d;
+}
+
+.modal__recap-msg-time {
+  flex-shrink: 0;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--orange);
+  white-space: nowrap;
+}
+
+.modal__recap-ask {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.modal__recap-ask[hidden] { display: none; }
+
+.modal__recap-ask-input {
+  flex: 1;
+  min-width: 0;
+  border: 2px solid #201c1d;
+  border-radius: 128px;
+  padding: 20px 32px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: #201c1d;
+  background: transparent;
+}
+
+.modal__recap-ask-input::placeholder { color: rgba(32, 28, 29, 0.35); }
+
+.modal__recap-speak {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 20px 24px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal__recap-speak img { width: 24px; height: 24px; }
+
+.modal__recap-speak:hover { background: rgba(32, 28, 29, 0.06); }
+
+.modal__recap-search {
+  width: 100%;
+  border: 2px solid #201c1d;
+  border-radius: 128px;
+  padding: 20px 32px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: rgba(32, 28, 29, 0.35);
+  background: transparent;
+}
+
+.modal__recap-search[hidden] { display: none; }
+
+/* ---------- Mini player: floats over the page, no dark overlay ---------- */
+
+.mini-player {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  z-index: 90;
+  width: 260px;
+  padding: 20px;
+  background: #d9d9d9;
+  border-radius: 32px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #201c1d;
+  opacity: 0;
+  transform: translateY(24px) scale(0.94);
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mini-player[hidden] { display: none; }
+
+.mini-player.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.mini-player__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mini-player__label {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.mini-player__recap {
+  flex-shrink: 0;
+  border: 2px dashed #201c1d;
+  border-radius: 128px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 12px;
+  color: #201c1d;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.mini-player__recap:hover { background: rgba(32, 28, 29, 0.08); }
+
+.mini-player__waveform {
+  position: relative;
+  height: 100px;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-player__blob {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.mini-player__blob.is-paused { animation-play-state: paused; }
+
+.mini-player__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mini-player__timer {
+  font-weight: 500;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-player__controls {
+  display: flex;
+  gap: 8px;
+}
+
+.mini-player__pause,
+.mini-player__stop {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.mini-player__pause:hover,
+.mini-player__stop:hover { transform: scale(1.06); }
+
+.mini-player__pause {
+  border: none;
+  background: #201c1d;
+}
+
+.mini-player__pause img { width: 16px; height: 16px; }
+
+.mini-player__stop {
+  border: 2px dashed var(--orange);
+  background: transparent;
+}
+
+.mini-player__stop img { width: 16px; height: 16px; }
