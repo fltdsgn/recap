@@ -1,3 +1,30 @@
+// Plays a one-shot CSS entrance animation (adds loadingClass, removes it
+// again once the animation finishes) instead of leaving it keyed off some
+// permanent state class - an animation left attached forever (even
+// finished, held via fill-mode) outranks its own :hover rule in the
+// cascade, and replays on every later display:none/'' toggle (e.g.
+// filtering by tab) instead of just the one real load-in.
+function playOneShotEntrance(el, loadingClass, pendingClass) {
+  if (pendingClass) el.classList.remove(pendingClass);
+  el.classList.add(loadingClass);
+  el.addEventListener('animationend', () => el.classList.remove(loadingClass), { once: true });
+}
+
+// --- Board loader: a brief splash (logo + fill bar) before the board
+// itself reveals - see the matching CSS (.board-loader, body.app-ready)
+// for what actually animates. This just times the handoff. ---
+const boardLoader = document.getElementById('board-loader');
+setTimeout(() => {
+  document.body.classList.add('app-ready');
+  boardLoader?.classList.add('is-hidden');
+  document.querySelectorAll('.note--pending').forEach((note) => {
+    playOneShotEntrance(note, 'note--loading-in', 'note--pending');
+  });
+  document.querySelectorAll('.events__list .event').forEach((ev) => {
+    playOneShotEntrance(ev, 'event--loading-in');
+  });
+}, 1100);
+
 const viewport = document.querySelector('.canvas__viewport');
 const canvasWorld = document.querySelector('.canvas__world');
 let notes = document.querySelectorAll('.note');
@@ -80,6 +107,22 @@ function saveNotePosition(note) {
     // storage full/unavailable (private browsing etc.) - dragging still
     // works for the rest of this session, it just won't survive a reload.
   }
+}
+
+// Shared by the recap screen's Delete button and each note's own "..." menu
+// - confirms, then removes the note for good. Resolves false if the user
+// backs out, so callers know not to also close/reset around it.
+async function deleteBoardNote(note) {
+  if (!note) return false;
+  const confirmed = await showConfirmDialog({
+    title: 'Delete this session?',
+    message: 'This removes it for good - it can\'t be undone.',
+    confirmText: 'Delete',
+  });
+  if (!confirmed) return false;
+  note.remove();
+  notes = document.querySelectorAll('.note');
+  return true;
 }
 
 // Place notes at their world coordinates - a saved (dragged) position from
@@ -194,6 +237,109 @@ notes.forEach((note) => {
   note.addEventListener('pointermove', onPointerMove);
   note.addEventListener('pointerup', onPointerUp);
 });
+
+// --- Turning a just-started session into a real board note - see the
+// "Start Session" handler below, which is where a session actually
+// "exists" now (no separate save step at the end anymore). ---
+const AVATAR_POOL = [
+  'assets/img/avatar-1.png', 'assets/img/avatar-2.png', 'assets/img/avatar-3.png',
+  'assets/img/avatar-4.png', 'assets/img/avatar-5.png', 'assets/img/avatar-6.png',
+  'assets/img/avatar-7.png',
+];
+
+function noteMetaLabel(date) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  let h = date.getHours();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  const m = date.getMinutes().toString().padStart(2, '0');
+  return `${months[date.getMonth()]} ${date.getDate()} · ${h}:${m} ${ampm}`;
+}
+
+function buildAvatarStackHTML(names) {
+  if (names.length <= 1) {
+    return `<div class="avatar avatar--solo"><img src="${AVATAR_POOL[0]}" alt=""></div>`;
+  }
+  const shown = names.slice(0, 3);
+  const extra = names.length - shown.length;
+  const avatarsHTML = shown
+    .map((_, i) => `<div class="avatar"><img src="${AVATAR_POOL[i % AVATAR_POOL.length]}" alt=""></div>`)
+    .join('');
+  const counterHTML = extra > 0 ? `<div class="avatar avatar--counter">+${extra}</div>` : '';
+  return avatarsHTML + counterHTML;
+}
+
+// White is reserved for "the most recent session" (see .note--white) -
+// whichever note held that title before hands it back to plain tan.
+function markAsMostRecentNote(note) {
+  document.querySelectorAll('.note--white').forEach((n) => {
+    n.classList.remove('note--white');
+    n.classList.add('note--tan');
+  });
+  note.classList.remove('note--tan');
+  note.classList.add('note--white');
+}
+
+function createBoardNoteFromSession({ title, text, names }) {
+  if (!canvasWorld) return null;
+
+  const note = document.createElement('div');
+  note.className = 'note note--tan';
+  note.dataset.title = title || 'Untitled session';
+
+  // Drop it near the middle of whatever's on screen right now, with a
+  // little random scatter and tilt so it doesn't land in the exact spot as
+  // the last one - reads like it was tossed onto the board, same as the
+  // seed notes' own randomized angles.
+  const cx = (viewport.scrollLeft + viewport.clientWidth / 2) / canvasScale;
+  const cy = (viewport.scrollTop + viewport.clientHeight / 2) / canvasScale;
+  const x = Math.round(cx - 150 + (Math.random() - 0.5) * 160);
+  const y = Math.round(cy - 90 + (Math.random() - 0.5) * 160);
+  const angle = (Math.random() * 16 - 8).toFixed(2);
+
+  note.dataset.x = x;
+  note.dataset.y = y;
+  note.style.left = `${x}px`;
+  note.style.top = `${y}px`;
+  note.style.setProperty('--note-rotate', `${angle}deg`);
+
+  note.innerHTML = `
+    <div class="note__head">
+      <div class="avatar-stack">${buildAvatarStackHTML(names)}</div>
+    </div>
+    <div class="note__content">
+      <p class="note__meta">${noteMetaLabel(new Date())}</p>
+      <p class="note__title"></p>
+      <p class="note__text"></p>
+      <span class="badge">All Meets</span>
+    </div>
+  `;
+  // textContent, not part of the template string above, so a typed
+  // title/message can't inject markup.
+  note.querySelector('.note__title').textContent = title || 'Untitled session';
+  note.querySelector('.note__text').textContent = text || '';
+
+  canvasWorld.appendChild(note);
+  // Same one-shot "drop onto the board" entrance the initial batch gets,
+  // played immediately (no stagger delay - this is a single live addition,
+  // not a batch loading in) and removed once done, same reason as there.
+  note.style.animationDelay = '0s';
+  playOneShotEntrance(note, 'note--loading-in');
+  note.addEventListener('pointerdown', onPointerDown);
+  note.addEventListener('pointermove', onPointerMove);
+  note.addEventListener('pointerup', onPointerUp);
+  attachFolderMoveMenu(note, {
+    onChange(key, name) {
+      const badge = note.querySelector('.badge');
+      if (badge) badge.textContent = key ? name : 'All Meets';
+    },
+    onDelete: () => deleteBoardNote(note),
+  });
+
+  markAsMostRecentNote(note);
+  notes = document.querySelectorAll('.note');
+  return note;
+}
 
 // --- Folder switching: filter the board's notes by folder, like tabs ---
 let folderButtons = document.querySelectorAll('.folder[data-folder]');
@@ -345,7 +491,7 @@ function closeFolderModal() {
     if (folderMoveField) folderMoveField.hidden = false;
     updateFolderCreateState();
     setMoveListOpen(false);
-  }, 200);
+  }, 400);
 }
 
 function submitFolderModal() {
@@ -457,7 +603,7 @@ function showConfirmDialog({ title, message, confirmText = 'Confirm', cancelText
       confirmModal.classList.remove('is-open');
       setTimeout(() => {
         confirmModal.hidden = true;
-      }, 200);
+      }, 400);
       cleanup();
       resolve(result);
     }
@@ -681,7 +827,7 @@ document.querySelectorAll('.folder-item').forEach((item) => {
 // archived session note on the board) into a folder, or clear it back to
 // none. `onChange` lets a caller react to the move (e.g. a note updating
 // its visible folder badge text) - the event cards don't need one. ---
-function attachFolderMoveMenu(el, { onChange } = {}) {
+function attachFolderMoveMenu(el, { onChange, onDelete } = {}) {
   if (el.querySelector(':scope > .event-menu-trigger')) return; // already attached
 
   const trigger = document.createElement('button');
@@ -717,6 +863,7 @@ function attachFolderMoveMenu(el, { onChange } = {}) {
       <span class="event-menu-dropdown__label">Move to folder</span>
       ${rows.join('') || '<span class="event-menu-dropdown__label">No folders yet</span>'}
       ${currentFolder ? '<button type="button" data-folder-key="">All Meets</button>' : ''}
+      ${onDelete ? '<div class="event-menu-dropdown__divider"></div><button type="button" data-action="delete">Delete</button>' : ''}
     `;
     dropdown.querySelectorAll('[data-folder-key]').forEach((row) => {
       row.addEventListener('click', () => {
@@ -726,6 +873,10 @@ function attachFolderMoveMenu(el, { onChange } = {}) {
         closeMenu();
         onChange?.(key, row.dataset.folderName || '');
       });
+    });
+    dropdown.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
+      closeMenu();
+      onDelete?.();
     });
   }
 
@@ -755,6 +906,7 @@ notes.forEach((note) => {
       const badge = note.querySelector('.badge');
       if (badge) badge.textContent = key ? name : 'All Meets';
     },
+    onDelete: () => deleteBoardNote(note),
   });
 });
 
@@ -930,14 +1082,19 @@ function openModal({ focusTitle = true } = {}) {
 
 function closeModal() {
   sessionModal.classList.remove('is-open');
+  sessionModal.classList.add('is-closing');
   setTimeout(() => {
     sessionModal.hidden = true;
-  }, 200);
+    sessionModal.classList.remove('is-closing');
+  }, 350);
 }
 
 ctaButton?.addEventListener('click', () => {
   if (sessionInProgress) return;
   openModal();
+  document.querySelectorAll('.modal__cal-event').forEach((ev) => {
+    playOneShotEntrance(ev, 'modal__cal-event--loading-in');
+  });
 });
 
 function closeModalAndReset() {
@@ -1426,6 +1583,10 @@ function resizeOrbSoon(orb, framesLeft = 12) {
 function enterMeetingScreen() {
   sessionInProgress = true;
   updateCtaAvailability();
+  // Clean slate - a fresh session hasn't created its board note yet
+  // ("Start Session" does that), and shouldn't inherit whatever this
+  // pointed at last time (an old archived note, or the last session's).
+  currentArchiveNote = null;
   // Leave "Prepare" FIRST - setPeoplePanelOpen(false) below checks
   // modalBefore.hidden to decide whether to bring Agenda back, and that
   // guard needs to already see we've moved on, or it'd reopen Agenda
@@ -1494,22 +1655,14 @@ const recapPanes = {
 const recapAskRow = document.getElementById('recap-ask-row');
 const recapSearchRow = document.getElementById('recap-search-row');
 const modalRecapDelete = document.getElementById('modal-recap-delete');
-const modalRecapSave = document.getElementById('modal-recap-save');
 
-// Set only when opened from an archived note on the board (see
-// openArchiveSession below) - lets Delete remove that same note.
+// Set from openArchiveSession (an old note) or from "Start Session" (the
+// note this in-progress session just created) - lets Delete remove it.
 let currentArchiveNote = null;
 
-modalRecapSave?.addEventListener('click', closeModalAndReset);
-
 modalRecapDelete?.addEventListener('click', async () => {
-  const confirmed = await showConfirmDialog({
-    title: 'Delete this session?',
-    message: 'This removes it for good - it can\'t be undone.',
-    confirmText: 'Delete',
-  });
-  if (!confirmed) return;
-  currentArchiveNote?.remove();
+  const deleted = await deleteBoardNote(currentArchiveNote);
+  if (!deleted) return;
   currentArchiveNote = null;
   closeModalAndReset();
 });
@@ -1550,12 +1703,13 @@ transcriptViewToggle?.addEventListener('click', (e) => {
 function enterRecapScreen() {
   stopMeetTimer();
   window.voiceOrbs?.stop();
-  currentArchiveNote = null;
+  // currentArchiveNote is left as-is here - "Start Session" already pointed
+  // it at the board note this session created, and Delete on this screen
+  // needs that reference to still be there.
   setModalStep(3, 3);
   if (modalRecapTitle) modalRecapTitle.textContent = modalTitleInput?.value.trim() || 'Product Roadmap Alignment';
   setRecapTab('chat');
   applyRecapContent(modalMessageInput?.value.trim() || '');
-  if (modalRecapSave) modalRecapSave.hidden = false;
   if (modalMeet) modalMeet.hidden = true;
   if (modalRecap) modalRecap.hidden = false;
   modalCard?.classList.add('is-recap');
@@ -1579,8 +1733,6 @@ function openArchiveSession(note) {
   if (modalRecapTitle) modalRecapTitle.textContent = note.dataset.title || noteText || 'Archived session';
   setRecapTab('chat');
   applyRecapContent(noteText);
-  // Already archived - there's nothing left to "save", just Chat/Transcript.
-  if (modalRecapSave) modalRecapSave.hidden = true;
 
   if (modalBefore) modalBefore.hidden = true;
   if (modalMeet) modalMeet.hidden = true;
@@ -1602,12 +1754,7 @@ function openArchiveSession(note) {
 const recapChatThread = document.getElementById('recap-chat-thread');
 const recapSummaryEl = document.querySelector('.modal__recap-summary');
 const recapChipsRow = document.getElementById('recap-chips');
-const recapChipsClearBtn = document.getElementById('recap-chips-clear');
 const recapAskInput = document.getElementById('recap-ask-input');
-
-recapChipsClearBtn?.addEventListener('click', () => {
-  if (recapChipsRow) recapChipsRow.innerHTML = '';
-});
 
 let recapClauses = [];
 let recapClauseRoles = {}; // clause (lowercase) -> 'main' | 'brief' | 'secondary'
@@ -1754,6 +1901,11 @@ function recapNowLabel() {
 // A chat Q&A round is really the same kind of message as a Transcript
 // line - one's just delivered by the bot instead of pulled from the
 // recording - so it reuses the exact same .modal__recap-msg markup.
+function scrollRecapThreadToBottom() {
+  const body = recapChatThread?.closest('.modal__recap-panes');
+  if (body) body.scrollTop = body.scrollHeight;
+}
+
 function askRecapQuestion(question) {
   const text = question.trim();
   if (!text || !recapChatThread) return;
@@ -1770,31 +1922,50 @@ function askRecapQuestion(question) {
     </div>
   `;
   recapChatThread.appendChild(userMsg);
+  if (recapAskInput) recapAskInput.value = '';
+  scrollRecapThreadToBottom();
 
   const speaker = RECAP_SPEAKERS[recapAnswerCounter % RECAP_SPEAKERS.length];
   const answerText = recapAnswerFor(text);
   recapAnswerCounter += 1;
 
-  const answerMsg = document.createElement('article');
-  answerMsg.className = 'modal__recap-msg modal__recap-msg--other';
-  answerMsg.innerHTML = `
+  // No one answers instantly - a beat of "thinking" (three dots, same
+  // bubble/avatar the real answer lands in) before the reply actually
+  // shows up reads far more like a real reply than an instant swap.
+  const thinkingMsg = document.createElement('article');
+  thinkingMsg.className = 'modal__recap-msg modal__recap-msg--other modal__recap-msg--thinking';
+  thinkingMsg.innerHTML = `
     <div class="modal__recap-msg-avatar"><img src="${speaker.avatar}" alt=""></div>
     <div class="modal__recap-msg-bubble">
       <div class="modal__recap-msg-head">
         <span class="modal__recap-msg-name">${escapeHTML(speaker.name)}</span>
         <span class="modal__recap-msg-role">${escapeHTML(speaker.role)}</span>
       </div>
-      <div class="modal__recap-msg-row">
-        <p class="modal__recap-msg-text">${escapeHTML(answerText)}</p>
-        <span class="modal__recap-msg-time">${recapNowLabel()}</span>
-      </div>
+      <div class="modal__recap-msg-typing"><span></span><span></span><span></span></div>
     </div>
   `;
-  recapChatThread.appendChild(answerMsg);
+  recapChatThread.appendChild(thinkingMsg);
+  scrollRecapThreadToBottom();
 
-  if (recapAskInput) recapAskInput.value = '';
-  const body = recapChatThread.closest('.modal__recap-panes');
-  if (body) body.scrollTop = body.scrollHeight;
+  setTimeout(() => {
+    const answerMsg = document.createElement('article');
+    answerMsg.className = 'modal__recap-msg modal__recap-msg--other';
+    answerMsg.innerHTML = `
+      <div class="modal__recap-msg-avatar"><img src="${speaker.avatar}" alt=""></div>
+      <div class="modal__recap-msg-bubble">
+        <div class="modal__recap-msg-head">
+          <span class="modal__recap-msg-name">${escapeHTML(speaker.name)}</span>
+          <span class="modal__recap-msg-role">${escapeHTML(speaker.role)}</span>
+        </div>
+        <div class="modal__recap-msg-row">
+          <p class="modal__recap-msg-text">${escapeHTML(answerText)}</p>
+          <span class="modal__recap-msg-time">${recapNowLabel()}</span>
+        </div>
+      </div>
+    `;
+    thinkingMsg.replaceWith(answerMsg);
+    scrollRecapThreadToBottom();
+  }, 900);
 }
 
 // Clicking a highlighted phrase in the summary asks about it, same as
@@ -1825,6 +1996,14 @@ modalStartBtn?.addEventListener('click', () => {
   if (modalStatusRow) modalStatusRow.hidden = false;
   if (modalMeetActions) modalMeetActions.hidden = false;
   setMeetPaused(false);
+
+  // The session "exists" from here on, not after some later save step -
+  // it becomes a real board note the moment recording actually starts.
+  currentArchiveNote = createBoardNoteFromSession({
+    title: modalTitleInput?.value.trim(),
+    text: modalMessageInput?.value.trim(),
+    names: getSelectedNames(),
+  });
 });
 
 // Minimizing closes the dark modal overlay but keeps the recording (timer,

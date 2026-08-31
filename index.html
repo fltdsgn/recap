@@ -7,13 +7,27 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="board-loader" id="board-loader">
+    <div class="board-loader__logo">Recap.</div>
+    <div class="board-loader__bar"><div class="board-loader__bar-fill"></div></div>
+  </div>
+
+  <!-- The board (drag-and-drop canvas, side panels) needs real screen
+       space to work at all - rather than let it render broken on a phone,
+       swap in a plain "come back on desktop" message instead. Pure CSS
+       (media query in styles.css) - no JS needed to pick one or the other. -->
+  <div class="mobile-stub">
+    <div class="mobile-stub__logo">Recap.</div>
+    <p class="mobile-stub__text">This board needs a bigger screen to work properly - please open it on a desktop or laptop.</p>
+  </div>
+
   <div class="board">
 
     <!-- Sidebar -->
     <aside class="sidebar">
       <nav class="folder-list scroll-thin scroll-thin--light">
         <div class="folder-item">
-          <button class="folder-new" type="button" id="folder-new-btn" title="Create new folder">
+          <button class="folder-new" type="button" id="folder-new-btn" aria-label="Create new folder">
             <img class="folder-new__icon" src="assets/img/icon-add.svg" alt="">
           </button>
         </div>
@@ -89,7 +103,7 @@
       <div class="canvas__viewport scroll-thin">
         <div class="canvas__world">
 
-          <div class="note note--white note--1" data-folder="wannabe" data-title="Feature Adoption Check-in" data-x="2296" data-y="2345" style="transform: rotate(9.28deg);">
+          <div class="note note--white note--1 note--pending" data-folder="wannabe" data-title="Feature Adoption Check-in" data-x="2296" data-y="2345" style="--note-rotate: 9.28deg;">
             <div class="note__head">
               <div class="avatar-stack">
                 <div class="avatar"><img src="assets/img/avatar-1.png" alt=""></div>
@@ -106,7 +120,7 @@
             </div>
           </div>
 
-          <div class="note note--tan note--2" data-folder="wannabe" data-title="Landing Page Review" data-x="2399" data-y="2435" style="transform: rotate(-13.19deg);">
+          <div class="note note--tan note--2 note--pending" data-folder="wannabe" data-title="Landing Page Review" data-x="2399" data-y="2435" style="--note-rotate: -13.19deg;">
             <div class="note__head">
               <div class="avatar-stack">
                 <div class="avatar avatar--solo"><img src="assets/img/avatar-1.png" alt=""></div>
@@ -120,7 +134,7 @@
             </div>
           </div>
 
-          <div class="note note--tan note--3" data-folder="wannabe" data-title="Design Critique" data-x="2810" data-y="2105" style="transform: rotate(6.12deg);">
+          <div class="note note--tan note--3 note--pending" data-folder="wannabe" data-title="Design Critique" data-x="2810" data-y="2105" style="--note-rotate: 6.12deg;">
             <div class="note__head">
               <div class="avatar-stack">
                 <div class="avatar avatar--solo"><img src="assets/img/avatar-1.png" alt=""></div>
@@ -134,7 +148,7 @@
             </div>
           </div>
 
-          <div class="note note--tan note--4" data-folder="tefs" data-title="Design Process Review" data-x="2137" data-y="2790" style="transform: rotate(-11.2deg);">
+          <div class="note note--tan note--4 note--pending" data-folder="tefs" data-title="Design Process Review" data-x="2137" data-y="2790" style="--note-rotate: -11.2deg;">
             <div class="note__head">
               <div class="avatar-stack">
                 <div class="avatar"><img src="assets/img/avatar-1.png" alt=""></div>
@@ -151,7 +165,7 @@
             </div>
           </div>
 
-          <div class="note note--tan note--5" data-title="Churn Metrics Review" data-x="2750" data-y="2700" style="transform: rotate(-6deg);">
+          <div class="note note--tan note--5 note--pending" data-title="Churn Metrics Review" data-x="2750" data-y="2700" style="--note-rotate: -6deg;">
             <div class="note__head">
               <div class="avatar-stack">
                 <div class="avatar avatar--solo"><img src="assets/img/avatar-3.png" alt=""></div>
@@ -229,6 +243,7 @@
       </div>
 
       <div class="events__list">
+        <div class="events__loading"></div>
         <article class="event event--featured" data-tab="today">
           <div class="event__head">
             <h3>Product Roadmap Alignment</h3>
@@ -638,6 +653,13 @@
               </div>
 
               <div class="modal__recap-input-area">
+                <div class="modal__recap-chips" id="recap-chips">
+                  <button type="button" class="modal__recap-chip">Navigation changes?</button>
+                  <button type="button" class="modal__recap-chip">Testing?</button>
+                  <button type="button" class="modal__recap-chip">Their reaction?</button>
+                  <button type="button" class="modal__recap-chip">Next steps?</button>
+                </div>
+
                 <div class="modal__recap-ask" id="recap-ask-row">
                   <input type="text" class="modal__recap-ask-input" id="recap-ask-input" placeholder="Ask about this session…">
                   <button type="button" class="modal__recap-speak">
@@ -646,21 +668,7 @@
                   </button>
                 </div>
                 <input type="text" class="modal__recap-search" id="recap-search-row" placeholder="Search transcript" hidden>
-
-                <button type="button" class="modal__end-session modal__recap-save" id="modal-recap-save">Save session and close</button>
               </div>
-            </div>
-
-            <div class="modal__recap-chips-wrap">
-              <div class="modal__recap-chips" id="recap-chips">
-                <button type="button" class="modal__recap-chip">Navigation changes?</button>
-                <button type="button" class="modal__recap-chip">Testing?</button>
-                <button type="button" class="modal__recap-chip">Their reaction?</button>
-                <button type="button" class="modal__recap-chip">Next steps?</button>
-              </div>
-              <button type="button" class="modal__recap-chips-clear" id="recap-chips-clear" title="Clear suggestions">
-                <img src="assets/img/icon-close-dark.svg" alt="">
-              </button>
             </div>
           </div>
         </div>
