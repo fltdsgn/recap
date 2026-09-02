@@ -29,6 +29,53 @@ const viewport = document.querySelector('.canvas__viewport');
 const canvasWorld = document.querySelector('.canvas__world');
 let notes = document.querySelectorAll('.note');
 
+// Ghost "drop a sticker here" slot, shown only when the active folder has
+// no sessions of its own - a hint for where the first one would land,
+// not a permanent fixture cluttering folders that already have content.
+// Clicking it starts the same "New session" flow as the CTA button. Its
+// position isn't fixed - see positionEmptySlot below, called from
+// selectFolder with whichever notes that folder actually shows, so it
+// lands near them instead of one single global spot (which could be
+// right next to a big cluster in one folder and far from a lone note in
+// another).
+const boardEmptySlot = document.getElementById('board-empty-slot');
+function updateBoardEmptyState() {
+  if (!boardEmptySlot) return;
+  const hasVisibleNote = [...notes].some((n) => n.style.display !== 'none');
+  boardEmptySlot.hidden = hasVisibleNote;
+}
+boardEmptySlot?.addEventListener('click', () => openModal());
+
+const EMPTY_SLOT_W = 300;
+const EMPTY_SLOT_H = 340;
+const EMPTY_SLOT_MARGIN = 60;
+
+// Places the slot just outside the given notes' combined bounding box
+// (to the right, vertically aligned with their top) so it always reads
+// as "part of this cluster" instead of a fixed spot elsewhere on the
+// 5000x5000 world. Falls back to a sane default when there's nothing to
+// anchor to (an empty folder).
+function positionEmptySlot(visibleNotes) {
+  if (!boardEmptySlot) return;
+  let x = 3300;
+  let y = 2400;
+  if (visibleNotes.length) {
+    const boxes = visibleNotes.map((n) => ({
+      left: parseFloat(n.style.left),
+      top: parseFloat(n.style.top),
+      right: parseFloat(n.style.left) + (n.offsetWidth || 300),
+    }));
+    const maxRight = Math.max(...boxes.map((b) => b.right));
+    const minTop = Math.min(...boxes.map((b) => b.top));
+    x = Math.round(maxRight + EMPTY_SLOT_MARGIN);
+    y = Math.round(minTop);
+  }
+  boardEmptySlot.dataset.x = x;
+  boardEmptySlot.dataset.y = y;
+  boardEmptySlot.style.left = `${x}px`;
+  boardEmptySlot.style.top = `${y}px`;
+}
+
 // --- Canvas zoom: canvasWorld is scaled with the (non-standard but
 // Chromium/Safari/modern-Firefox-supported) `zoom` property rather than a
 // CSS transform, because zoom actually changes the box's layout size -
@@ -122,6 +169,7 @@ async function deleteBoardNote(note) {
   if (!confirmed) return false;
   note.remove();
   notes = document.querySelectorAll('.note');
+  updateBoardEmptyState();
   return true;
 }
 
@@ -161,6 +209,7 @@ function centerViewportOn(noteList, { smooth = true } = {}) {
 // Center the initial scroll on the note cluster so the board opens
 // centered on the archived sessions, even though they live inside a
 // 5000x5000 scrollable world.
+positionEmptySlot([...notes]);
 centerViewportOn([...notes], { smooth: false });
 
 // --- Drag notes around the board (a plain click with no movement opens
@@ -287,14 +336,42 @@ function createBoardNoteFromSession({ title, text, names }) {
   note.className = 'note note--tan';
   note.dataset.title = title || 'Untitled session';
 
+  // Land in whichever folder was open when the session was started - not
+  // always "All meets" regardless of context. "All" itself tags nothing,
+  // same as the seed notes that only ever show up in the "all" view.
+  const activeFolderBtn = document.querySelector('.folder--active[data-folder]');
+  const activeFolderKey = activeFolderBtn?.dataset.folder;
+  const activeFolderName = activeFolderBtn?.querySelector('.folder__name')?.textContent;
+  if (activeFolderKey && activeFolderKey !== 'all') {
+    note.dataset.folder = activeFolderKey;
+  }
+
   // Drop it near the middle of whatever's on screen right now, with a
   // little random scatter and tilt so it doesn't land in the exact spot as
   // the last one - reads like it was tossed onto the board, same as the
   // seed notes' own randomized angles.
   const cx = (viewport.scrollLeft + viewport.clientWidth / 2) / canvasScale;
   const cy = (viewport.scrollTop + viewport.clientHeight / 2) / canvasScale;
-  const x = Math.round(cx - 150 + (Math.random() - 0.5) * 160);
-  const y = Math.round(cy - 90 + (Math.random() - 0.5) * 160);
+  let x = Math.round(cx - 150 + (Math.random() - 0.5) * 160);
+  let y = Math.round(cy - 90 + (Math.random() - 0.5) * 160);
+
+  // The "create session" tile is a permanent fixture, not just an empty
+  // note slot - the note being born from clicking it would otherwise
+  // often land right on top of it, since both default to "wherever the
+  // camera currently is". Push clear of it (down and to the left) if the
+  // two would overlap.
+  if (boardEmptySlot) {
+    const slotX = parseFloat(boardEmptySlot.dataset.x);
+    const slotY = parseFloat(boardEmptySlot.dataset.y);
+    const slotW = boardEmptySlot.offsetWidth || EMPTY_SLOT_W;
+    const slotH = boardEmptySlot.offsetHeight || EMPTY_SLOT_H;
+    const overlaps = x < slotX + slotW && x + 300 > slotX && y < slotY + slotH && y + 300 > slotY;
+    if (overlaps) {
+      x = slotX - 340;
+      y = slotY + slotH + 40;
+    }
+  }
+
   const angle = (Math.random() * 16 - 8).toFixed(2);
 
   note.dataset.x = x;
@@ -311,13 +388,14 @@ function createBoardNoteFromSession({ title, text, names }) {
       <p class="note__meta">${noteMetaLabel(new Date())}</p>
       <p class="note__title"></p>
       <p class="note__text"></p>
-      <span class="badge">All Meets</span>
+      <span class="badge"></span>
     </div>
   `;
   // textContent, not part of the template string above, so a typed
-  // title/message can't inject markup.
+  // title/message (or folder name) can't inject markup.
   note.querySelector('.note__title').textContent = title || 'Untitled session';
   note.querySelector('.note__text').textContent = text || '';
+  note.querySelector('.badge').textContent = activeFolderName || 'All Meets';
 
   canvasWorld.appendChild(note);
   // Same one-shot "drop onto the board" entrance the initial batch gets,
@@ -338,6 +416,7 @@ function createBoardNoteFromSession({ title, text, names }) {
 
   markAsMostRecentNote(note);
   notes = document.querySelectorAll('.note');
+  updateBoardEmptyState();
   return note;
 }
 
@@ -380,7 +459,15 @@ function selectFolder(key) {
     if (show) visibleNotes.push(note);
   });
 
-  centerViewportOn(visibleNotes);
+  // Move the ghost slot next to whatever this folder actually shows,
+  // before centering on it - a lone note in a small folder shouldn't
+  // leave the slot sitting far away at some other folder's cluster spot.
+  positionEmptySlot(visibleNotes);
+  // Nothing to center on in an empty folder - fall back to the ghost
+  // slot itself so the camera still lands somewhere meaningful instead of
+  // wherever it happened to be left.
+  centerViewportOn(visibleNotes.length ? visibleNotes : [boardEmptySlot].filter(Boolean));
+  updateBoardEmptyState();
 }
 
 folderButtons.forEach((btn) => {
@@ -397,6 +484,7 @@ const folderMoveField = document.getElementById('folder-move-field');
 const folderMoveRow = folderMoveField?.querySelector('.folder-modal__move-row');
 const folderMovePill = document.getElementById('folder-move-pill');
 const folderMoveList = document.getElementById('folder-move-list');
+const folderMoveLabel = document.getElementById('folder-move-label');
 let moveListOpen = false;
 
 // The events list is the board's real session data - both the hardcoded
@@ -407,6 +495,16 @@ function getMovableSessions() {
 
 function sessionTitle(el) {
   return el.querySelector('h2, h3')?.textContent.trim() || 'Untitled session';
+}
+
+// Picking a row closed the list with zero visible feedback that anything
+// happened - the label just sat on its placeholder text forever. Reflect
+// the actual pick (or lack of one) back onto it.
+function updateMoveLabel() {
+  if (!folderMoveLabel) return;
+  const selected = folderMoveList?.querySelector('.modal__move-row.is-selected');
+  folderMoveLabel.textContent = selected ? selected.textContent : 'Move existing sessions here';
+  folderMoveLabel.classList.toggle('has-value', !!selected);
 }
 
 function setMoveListOpen(open) {
@@ -439,6 +537,7 @@ folderMoveList?.addEventListener('click', (e) => {
   const alreadySelected = row.classList.contains('is-selected');
   folderMoveList.querySelectorAll('.modal__move-row.is-selected').forEach((r) => r.classList.remove('is-selected'));
   if (!alreadySelected) row.classList.add('is-selected');
+  updateMoveLabel();
   setMoveListOpen(false);
 });
 
@@ -491,6 +590,10 @@ function closeFolderModal() {
     if (folderMoveField) folderMoveField.hidden = false;
     updateFolderCreateState();
     setMoveListOpen(false);
+    // Clear the picked session too - a fresh "New folder" next time this
+    // opens shouldn't remember what was moved for the last one.
+    if (folderMoveList) folderMoveList.innerHTML = '';
+    updateMoveLabel();
   }, 400);
 }
 
@@ -771,6 +874,7 @@ async function deleteFolder(item, btn) {
   item.remove();
   folderButtons = document.querySelectorAll('.folder[data-folder]');
   if (wasActive) selectFolder('all');
+  else updateBoardEmptyState();
 }
 
 function attachFolderMenu(item, btn) {
@@ -1508,6 +1612,7 @@ const modalBefore = document.getElementById('modal-before');
 const modalMeet = document.getElementById('modal-meet');
 const modalIntentionText = document.getElementById('modal-intention-text');
 const modalWaveformBlob = document.querySelector('.modal__waveform-blob');
+const modalMicStatus = document.getElementById('modal-mic-status');
 const modalWaveformPause = document.getElementById('modal-waveform-pause');
 const modalWaveformIconPause = document.getElementById('modal-waveform-icon-pause');
 const modalWaveformIconPlay = document.getElementById('modal-waveform-icon-play');
@@ -1565,7 +1670,15 @@ function setMeetPaused(paused) {
 
   // Mic access is only requested the first time recording actually starts,
   // not just from opening the Meeting step.
-  if (!paused) window.voiceOrbs?.start();
+  if (!paused) {
+    window.voiceOrbs?.start()?.then(() => {
+      if (!modalMicStatus) return;
+      const live = window.voiceOrbs?.isUsingMic?.();
+      modalMicStatus.hidden = false;
+      modalMicStatus.textContent = live ? 'Live mic' : 'Demo audio';
+      modalMicStatus.className = `modal__mic-status ${live ? 'modal__mic-status--live' : 'modal__mic-status--demo'}`;
+    });
+  }
 }
 
 // A single requestAnimationFrame (or the orb's own ResizeObserver) isn't
@@ -1627,7 +1740,7 @@ function enterMeetingScreen() {
   if (modalMeetActions) modalMeetActions.hidden = true;
 }
 
-function resetToBeforeScreen() {
+function resetToBeforeScreen({ keepMiniPlayer = false } = {}) {
   sessionInProgress = false;
   updateCtaAvailability();
   stopMeetTimer();
@@ -1636,7 +1749,11 @@ function resetToBeforeScreen() {
   if (modalMeet) modalMeet.hidden = true;
   if (modalRecap) modalRecap.hidden = true;
   modalCard?.classList.remove('is-recap');
-  setMiniPlayerOpen(false);
+  // endSession wants the mini player to stay open (it's about to switch it
+  // into the "processing" state) instead of closing then immediately
+  // reopening it - that race would leave a stale close timeout that hides
+  // it out from under the fresh open.
+  if (!keepMiniPlayer) setMiniPlayerOpen(false);
   // Agenda is the default right-hand panel on "Prepare" - Meeting/Compare
   // hid it, so bring it back now that we're landing back here.
   if (modalSideSlot) modalSideSlot.hidden = false;
@@ -1674,6 +1791,9 @@ function setRecapTab(tab) {
   });
   if (recapAskRow) recapAskRow.hidden = tab !== 'chat';
   if (recapSearchRow) recapSearchRow.hidden = tab !== 'transcript';
+  // The chips only ever feed the Chat thread - showing them over
+  // Transcript read as broken (click it, nothing visibly happens).
+  if (recapChipsRow) recapChipsRow.hidden = tab !== 'chat';
 }
 
 recapTabs.forEach((btn) => {
@@ -1722,6 +1842,22 @@ function openArchiveSession(note) {
   // doing that while one's in progress (even minimized) would hijack its
   // screen out from under it.
   if (sessionInProgress) return;
+  // Not ready to view yet - its recap is still "processing" (or failed
+  // and waiting on a retry from the mini player).
+  if (note.classList.contains('note--processing')) {
+    showAlertDialog({
+      title: 'Still processing',
+      message: "This session's recap isn't ready yet - hang tight, we'll let you know.",
+    });
+    return;
+  }
+  if (note.classList.contains('note--failed')) {
+    showAlertDialog({
+      title: 'Processing failed',
+      message: 'Use the mini player in the corner to retry.',
+    });
+    return;
+  }
   const noteText = note.querySelector('.note__text')?.textContent.trim() || '';
   currentArchiveNote = note;
 
@@ -2014,6 +2150,11 @@ const miniPlayerBlob = document.querySelector('.mini-player__blob');
 const miniPlayerTimer = document.getElementById('mini-player-timer');
 const miniPlayerPauseBtn = document.getElementById('mini-player-pause');
 const miniPlayerPauseIcon = document.getElementById('mini-player-pause-icon');
+const miniPlayerLabel = document.getElementById('mini-player-label');
+const miniPlayerWaveformEl = document.getElementById('mini-player-waveform');
+const miniPlayerProcessingEl = document.getElementById('mini-player-processing');
+const miniPlayerStatusEl = document.getElementById('mini-player-status');
+const miniPlayerFootEl = document.getElementById('mini-player-foot');
 const miniPlayerStopBtn = document.getElementById('mini-player-stop');
 
 function setMiniPlayerOpen(open) {
@@ -2032,21 +2173,126 @@ function setMiniPlayerOpen(open) {
 }
 
 modalMinimizeBtn?.addEventListener('click', () => {
+  setMiniPlayerMode('listening');
   closeModal();
   setMiniPlayerOpen(true);
 });
 
 miniPlayerRecap?.addEventListener('click', () => {
+  const mode = miniPlayer?.dataset.mode;
+  if (mode === 'ready' && processingNote) {
+    setMiniPlayerOpen(false);
+    openArchiveSession(processingNote);
+    return;
+  }
+  if (mode === 'failed' && processingNote) {
+    startRecapProcessing(processingNote);
+    return;
+  }
+  // Still actually listening - "Open recap" here just means "back to the
+  // meeting screen", same modal it was minimized from.
   setMiniPlayerOpen(false);
   openModal({ focusTitle: false });
 });
 
 miniPlayerPauseBtn?.addEventListener('click', () => setMeetPaused(!meetPaused));
 
+// --- Recap "processing": a just-ended session doesn't get its transcript
+// back instantly (Zoom-style, this can take a real while) - the mini
+// player switches into this state instead of closing, so the interface
+// stays usable in the meantime. Simulated here with a short timer and a
+// random chance of "failure", since there's no real backend to ask. ---
+const RECAP_PROCESSING_MS = 8000;
+const RECAP_FAILURE_CHANCE = 0.2;
+const miniPlayerElapsedEl = document.getElementById('mini-player-elapsed');
+let processingNote = null;
+let processingTimer = null;
+let processingElapsedInterval = null;
+let processingStartedAt = 0;
+
+function formatElapsed(totalSeconds) {
+  if (totalSeconds < 60) return `${totalSeconds.toFixed(1)}s`;
+  const m = Math.floor(totalSeconds / 60);
+  const s = (totalSeconds % 60).toFixed(1);
+  return `${m}m ${s}s`;
+}
+
+function setMiniPlayerMode(mode) {
+  if (!miniPlayer) return;
+  miniPlayer.dataset.mode = mode;
+  miniPlayer.classList.toggle('is-ready', mode === 'ready');
+  miniPlayer.classList.toggle('is-failed', mode === 'failed');
+
+  const live = mode === 'listening';
+  if (miniPlayerWaveformEl) miniPlayerWaveformEl.hidden = !live;
+  if (miniPlayerFootEl) miniPlayerFootEl.hidden = !live;
+  if (miniPlayerProcessingEl) miniPlayerProcessingEl.hidden = live;
+  if (miniPlayerRecap) miniPlayerRecap.hidden = mode === 'processing';
+
+  if (miniPlayerLabel) {
+    miniPlayerLabel.textContent = {
+      listening: 'Listening',
+      processing: 'Processing recap…',
+      ready: 'Recap ready',
+      failed: 'Processing failed',
+    }[mode];
+  }
+  if (miniPlayerRecap) miniPlayerRecap.textContent = mode === 'failed' ? 'Retry' : 'Open recap';
+  if (miniPlayerStatusEl) {
+    miniPlayerStatusEl.textContent = mode === 'failed'
+      ? "Something went wrong - tap Retry to try again."
+      : "This can take a while - we'll let you know.";
+  }
+}
+
+function startRecapProcessing(note) {
+  if (!note) return;
+  processingNote = note;
+  note.classList.remove('note--failed');
+  note.classList.add('note--processing');
+  note.dataset.statusLabel = 'Processing…';
+
+  setMiniPlayerMode('processing');
+  setMiniPlayerOpen(true);
+
+  processingStartedAt = performance.now();
+  if (miniPlayerElapsedEl) miniPlayerElapsedEl.textContent = '0.0s';
+  clearInterval(processingElapsedInterval);
+  processingElapsedInterval = setInterval(() => {
+    if (miniPlayerElapsedEl) {
+      miniPlayerElapsedEl.textContent = formatElapsed((performance.now() - processingStartedAt) / 1000);
+    }
+  }, 100);
+
+  clearTimeout(processingTimer);
+  processingTimer = setTimeout(() => {
+    finishRecapProcessing(note, Math.random() > RECAP_FAILURE_CHANCE);
+  }, RECAP_PROCESSING_MS);
+}
+
+function finishRecapProcessing(note, success) {
+  clearInterval(processingElapsedInterval);
+  note.classList.remove('note--processing');
+  if (success) {
+    delete note.dataset.statusLabel;
+    setMiniPlayerMode('ready');
+    // A glow on the card itself, not a modal yanked open out from under
+    // whatever the user's doing - opening it is still their call, made
+    // either from here or the mini player's "Open recap". The mini
+    // player stays up (no auto-close) until the user actually acts on it.
+    playOneShotEntrance(note, 'note--just-finished');
+  } else {
+    note.classList.add('note--failed');
+    note.dataset.statusLabel = 'Failed';
+    setMiniPlayerMode('failed');
+  }
+}
+
 function endSession() {
-  setMiniPlayerOpen(false);
-  enterRecapScreen();
-  openModal({ focusTitle: false });
+  const note = currentArchiveNote;
+  closeModal();
+  resetToBeforeScreen({ keepMiniPlayer: true });
+  if (note) startRecapProcessing(note);
 }
 
 modalEndBtn?.addEventListener('click', endSession);

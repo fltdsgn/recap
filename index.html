@@ -102,6 +102,9 @@
     <main class="canvas">
       <div class="canvas__viewport scroll-thin">
         <div class="canvas__world">
+          <button type="button" class="board-empty-slot" id="board-empty-slot" title="Create new session" data-x="3300" data-y="2400" style="left: 3300px; top: 2400px;" hidden>
+            <span class="board-empty-slot__cross"></span>
+          </button>
 
           <div class="note note--white note--1 note--pending" data-folder="wannabe" data-title="Feature Adoption Check-in" data-x="2296" data-y="2345" style="--note-rotate: 9.28deg;">
             <div class="note__head">
@@ -351,7 +354,7 @@
 
       <div class="folder-modal__move" id="folder-move-field">
         <div class="folder-modal__move-row">
-          <span class="folder-modal__move-label">Move existing sessions here</span>
+          <span class="folder-modal__move-label" id="folder-move-label">Move existing sessions here</span>
           <button type="button" class="folder-modal__move-toggle" id="folder-move-pill">
             <img src="assets/img/icon-chevron-down-dark.svg" alt="">
           </button>
@@ -451,6 +454,7 @@
                 </svg>
               </button>
               <span class="modal__listening-text">Listening · <span id="modal-timer">00:00</span></span>
+              <span class="modal__mic-status" id="modal-mic-status" hidden></span>
             </div>
           </div>
 
@@ -816,17 +820,37 @@
     </div>
   </div>
 
-  <!-- Mini player: floats over the page (no dark overlay) once the meeting
-       is minimized, so the recording keeps going while you browse the board. -->
+  <!-- Mini player: floats over the page (no dark overlay). Two lives - a
+       live recording while minimized (waveform + timer + pause/stop), and
+       after "End session" it turns into the recap-processing indicator
+       instead of closing, since the transcript doesn't come back
+       instantly and the interface shouldn't be blocked while it "processes". -->
   <div class="mini-player" id="mini-player" hidden>
     <div class="mini-player__head">
-      <span class="mini-player__label">Listening</span>
+      <span class="mini-player__label" id="mini-player-label">Listening</span>
       <button type="button" class="mini-player__recap" id="mini-player-recap">Open recap</button>
     </div>
-    <div class="mini-player__waveform">
+    <div class="mini-player__waveform" id="mini-player-waveform">
       <div class="mini-player__blob" id="mini-waveform-orb"></div>
     </div>
-    <div class="mini-player__foot">
+    <div class="mini-player__processing" id="mini-player-processing" hidden>
+      <div class="pixel-loader">
+        <span class="pixel-loader__grid" aria-hidden="true">
+          <span style="animation-delay: 90ms"></span>
+          <span style="animation-delay: 180ms"></span>
+          <span style="animation-delay: 270ms"></span>
+          <span style="animation-delay: 0ms"></span>
+          <span style="animation-delay: 90ms"></span>
+          <span style="animation-delay: 180ms"></span>
+          <span style="animation-delay: 90ms"></span>
+          <span style="animation-delay: 180ms"></span>
+          <span style="animation-delay: 270ms"></span>
+        </span>
+        <span class="pixel-loader__timer" id="mini-player-elapsed">0.0s</span>
+      </div>
+      <p class="mini-player__status" id="mini-player-status">This can take a while - we'll let you know.</p>
+    </div>
+    <div class="mini-player__foot" id="mini-player-foot">
       <span class="mini-player__timer" id="mini-player-timer">00:00:00</span>
       <div class="mini-player__controls">
         <button type="button" class="mini-player__pause" id="mini-player-pause">

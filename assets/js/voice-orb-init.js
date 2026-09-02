@@ -22,4 +22,8 @@ window.voiceOrbs = {
   mini: miniOrb,
   start: () => VoiceEngine.start(),
   stop: () => VoiceEngine.stop(),
+  // Lets script.js tell the user whether the orb is actually driven by
+  // their real microphone or the procedural fallback (permission denied,
+  // no mic, or an insecure/non-localhost origin).
+  isUsingMic: () => VoiceEngine.usingMic,
 };

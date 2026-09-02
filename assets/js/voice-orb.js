@@ -6,23 +6,75 @@ const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const lerp = (from, to, amount) => from + (to - from) * amount;
 
 // The public name stays VoiceEngine because voice-orb-init.js already imports
-// it. For now it is a procedural motion engine: no microphone permission is
-// requested. Starting a session activates the movement in both canvases.
+// it. Requests real microphone access via getUserMedia + an AnalyserNode -
+// only the first time a session actually starts recording (see setMeetPaused
+// in script.js), not just from opening the Meeting screen. Audio is never
+// recorded/stored anywhere, only sampled live for the visual - matches the
+// "no server, no hard drives" architecture this project's mic feature was
+// scoped to. Falls back to the old procedural motion if permission is
+// denied or no mic is available, so the orb still animates either way.
 const VoiceEngine = {
   active: false,
+  usingMic: false,
+  _stream: null,
+  _audioCtx: null,
+  _analyser: null,
+  _data: null,
 
   async start() {
+    if (this.active) return true;
     this.active = true;
+    if (this.usingMic) return true; // already set up from a prior start()
+
+    try {
+      this._stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this._audioCtx = new AudioCtx();
+      const source = this._audioCtx.createMediaStreamSource(this._stream);
+      this._analyser = this._audioCtx.createAnalyser();
+      this._analyser.fftSize = 256;
+      this._analyser.smoothingTimeConstant = 0.6;
+      source.connect(this._analyser);
+      this._data = new Uint8Array(this._analyser.frequencyBinCount);
+      this.usingMic = true;
+    } catch (err) {
+      // No mic, permission denied, or an insecure (non-https/localhost)
+      // context - the orb still needs to move, just without real input.
+      console.warn('Mic unavailable, falling back to procedural motion:', err);
+      this.usingMic = false;
+    }
     return true;
   },
 
   stop() {
     this.active = false;
+    this._stream?.getTracks().forEach((track) => track.stop());
+    this._audioCtx?.close();
+    this._stream = null;
+    this._audioCtx = null;
+    this._analyser = null;
+    this._data = null;
+    this.usingMic = false;
   },
 
   sample() {
     if (!this.active) {
       return { level: 0, bass: 0, mid: 0, high: 0 };
+    }
+
+    if (this.usingMic && this._analyser && this._data) {
+      this._analyser.getByteFrequencyData(this._data);
+      const bins = this._data.length;
+      const third = Math.floor(bins / 3);
+      const bandAverage = (start, end) => {
+        let sum = 0;
+        for (let i = start; i < end; i += 1) sum += this._data[i];
+        return sum / (end - start) / 255;
+      };
+      const bass = bandAverage(0, third);
+      const mid = bandAverage(third, third * 2);
+      const high = bandAverage(third * 2, bins);
+      return { level: (bass + mid + high) / 3, bass, mid, high };
     }
 
     const time = performance.now() * 0.001;

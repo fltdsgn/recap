@@ -593,6 +593,66 @@ body:not(.app-ready) .events__list .event { opacity: 0; }
   color: var(--tan-text);
 }
 
+/* A permanent "create a session" tile living at a real spot in
+   canvas__world, same as an actual note (left/top in the same world
+   coordinates) - present on every board/folder, not just an empty one,
+   so it pans/zooms with the board instead of staying pinned to the
+   screen. The + is always visible, not a hover reveal. */
+.board-empty-slot {
+  position: absolute;
+  z-index: 1;
+  width: 300px;
+  height: 340px;
+  border: 2px dashed rgba(234, 222, 200, 0.35);
+  border-radius: 32px;
+  background: rgba(234, 222, 200, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.board-empty-slot:hover {
+  border-color: rgba(234, 222, 200, 0.6);
+  background: rgba(234, 222, 200, 0.08);
+}
+
+.board-empty-slot__cross {
+  position: relative;
+  width: 32px;
+  height: 32px;
+}
+
+.board-empty-slot__cross::before,
+.board-empty-slot__cross::after {
+  content: '';
+  position: absolute;
+  background: rgba(234, 222, 200, 0.5);
+  transition: background-color 0.15s ease;
+}
+
+.board-empty-slot:hover .board-empty-slot__cross::before,
+.board-empty-slot:hover .board-empty-slot__cross::after {
+  background: rgba(234, 222, 200, 0.9);
+}
+
+.board-empty-slot__cross::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+}
+
+.board-empty-slot__cross::after {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
 .canvas__viewport {
   position: absolute;
   inset: 0;
@@ -706,6 +766,60 @@ body:not(.app-ready) .events__list .event { opacity: 0; }
    to sit in the markup (or drag order - .is-dragging's z-index still
    wins over this while actively dragging). */
 .note--white { background: #fff; z-index: 2; }
+
+/* Status badge while a just-ended session's recap is still "processing" -
+   not clickable to open until it clears (see openArchiveSession's early
+   return). A flat neutral grey instead of just fading opacity (which read
+   as "transparent white", not "not ready yet") - overrides whichever of
+   .note--tan/.note--white it's paired with. */
+.note--processing {
+  background: #9b9b9b;
+}
+
+.note--processing::after,
+.note--failed::after {
+  content: attr(data-status-label);
+  position: absolute;
+  top: -14px;
+  right: 20px;
+  padding: 6px 14px;
+  border-radius: 128px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.12px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.note--processing::after {
+  background: var(--navy);
+  animation: note-processing-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes note-processing-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* One-shot glow when a recap finishes processing - draws the eye to it
+   without yanking a modal open on top of whatever the user's doing. */
+.note--just-finished {
+  animation: note-just-finished-glow 1.2s ease-out;
+}
+
+@keyframes note-just-finished-glow {
+  0% { box-shadow: 0 4px 0 rgba(0, 0, 0, 0.48), 0 0 0 6px rgba(217, 77, 39, 0); }
+  30% { box-shadow: 0 4px 0 rgba(0, 0, 0, 0.48), 0 0 0 6px rgba(217, 77, 39, 0.55); }
+  100% { box-shadow: 0 4px 0 rgba(0, 0, 0, 0.48), 0 0 0 6px rgba(217, 77, 39, 0); }
+}
+
+.note--failed {
+  pointer-events: auto;
+}
+
+.note--failed::after {
+  background: var(--orange-shadow);
+}
 
 .note__meta {
   font-size: 14px;
@@ -1484,11 +1598,11 @@ body:not(.app-ready) .events__list .event { opacity: 0; }
 }
 
 .modal.is-open .modal__before > * {
-  animation: modalContentIn 0.35s ease both;
+  animation: modalContentIn 0.3s ease both;
 }
-.modal.is-open .modal__before > *:nth-child(1) { animation-delay: 0.3s; }
-.modal.is-open .modal__before > *:nth-child(3) { animation-delay: 0.6s; }
-.modal.is-open .modal__before > *:nth-child(4) { animation-delay: 0.9s; }
+.modal.is-open .modal__before > *:nth-child(1) { animation-delay: 0s; }
+.modal.is-open .modal__before > *:nth-child(3) { animation-delay: 0.08s; }
+.modal.is-open .modal__before > *:nth-child(4) { animation-delay: 0.16s; }
 
 /* The Agenda column is its own "layer" - arrives last, after the panel and
    its form fields have already landed, like the final piece sliding into
@@ -1500,7 +1614,7 @@ body:not(.app-ready) .events__list .event { opacity: 0; }
 
 .modal.is-open .modal__side-slot {
   animation: sideSlotIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 1.2s;
+  animation-delay: 0.16s;
 }
 
 /* Once the Agenda column itself has landed, its events load in one by one
@@ -1516,12 +1630,12 @@ body:not(.app-ready) .events__list .event { opacity: 0; }
    .modal.is-open would replay the stagger every time this calendar's own
    tabs get filtered, not just the one time it first loads in. */
 .modal__cal-event--loading-in { animation: calEventIn 0.3s ease both; }
-.modal__cal-event--loading-in:nth-child(1) { animation-delay: 1.3s; }
-.modal__cal-event--loading-in:nth-child(2) { animation-delay: 1.4s; }
-.modal__cal-event--loading-in:nth-child(3) { animation-delay: 1.5s; }
-.modal__cal-event--loading-in:nth-child(4) { animation-delay: 1.6s; }
-.modal__cal-event--loading-in:nth-child(5) { animation-delay: 1.7s; }
-.modal__cal-event--loading-in:nth-child(6) { animation-delay: 1.8s; }
+.modal__cal-event--loading-in:nth-child(1) { animation-delay: 0.22s; }
+.modal__cal-event--loading-in:nth-child(2) { animation-delay: 0.28s; }
+.modal__cal-event--loading-in:nth-child(3) { animation-delay: 0.34s; }
+.modal__cal-event--loading-in:nth-child(4) { animation-delay: 0.4s; }
+.modal__cal-event--loading-in:nth-child(5) { animation-delay: 0.46s; }
+.modal__cal-event--loading-in:nth-child(6) { animation-delay: 0.52s; }
 
 /* Steps 2/3 reuse the same "one after another" idea as Step 1, but the
    panel itself isn't moving anymore at that point (no horizontal slide to
@@ -1910,6 +2024,15 @@ body:not(.app-ready) .events__list .event { opacity: 0; }
   letter-spacing: -0.2px;
   color: #201c1d;
   opacity: 0.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Reads as real picked content, not still the dimmed placeholder, once a
+   session has actually been chosen from the list. */
+.folder-modal__move-label.has-value {
+  opacity: 1;
 }
 
 .folder-modal__move-toggle {
@@ -2288,6 +2411,39 @@ body:not(.app-ready) .events__list .event { opacity: 0; }
   font-size: 20px;
   color: #201c1d;
 }
+
+/* Tells you whether the waveform is actually driven by your real mic or
+   just the procedural fallback (permission denied/no mic/non-secure
+   origin) - the animation alone doesn't make that obvious either way. */
+.modal__mic-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 10px;
+  padding: 4px 10px;
+  border-radius: 128px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.modal__mic-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.modal__mic-status--live {
+  color: #1a7a3a;
+  background: rgba(26, 122, 58, 0.12);
+}
+.modal__mic-status--live::before { background: #1a7a3a; }
+
+.modal__mic-status--demo {
+  color: rgba(32, 28, 29, 0.55);
+  background: rgba(32, 28, 29, 0.06);
+}
+.modal__mic-status--demo::before { background: rgba(32, 28, 29, 0.35); }
 
 .modal__meet-actions {
   display: flex;
@@ -2918,6 +3074,68 @@ body:not(.app-ready) .events__list .event { opacity: 0; }
 }
 
 .mini-player__blob.is-paused { animation-play-state: paused; }
+
+/* Swapped in for .mini-player__waveform+__foot once a session ends and
+   its recap starts "processing" - see endSession/finishRecapProcessing. */
+.mini-player__processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+}
+
+/* Pixel-grid "wavefront" loader - a chevron of lit cells sweeping across
+   a 3x3 grid, paired with a live elapsed timer. A plain spinner read as
+   an afterthought here; this at least has some character. */
+.pixel-loader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.pixel-loader__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 6px);
+  gap: 2px;
+}
+
+.pixel-loader__grid span {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--orange);
+  opacity: 0.15;
+  animation: pixel-on 650ms ease-in-out infinite;
+}
+
+@keyframes pixel-on {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 1; }
+}
+
+.pixel-loader__timer {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: rgba(32, 28, 29, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixel-loader__grid span { animation: none; opacity: 0.5; }
+}
+
+.mini-player__status {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(32, 28, 29, 0.6);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.mini-player.is-failed .pixel-loader { display: none; }
+.mini-player.is-failed .mini-player__status { color: var(--orange-shadow); }
 
 .mini-player__foot {
   display: flex;
